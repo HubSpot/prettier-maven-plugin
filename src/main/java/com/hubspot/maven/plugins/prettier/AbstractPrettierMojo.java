@@ -1,8 +1,14 @@
 package com.hubspot.maven.plugins.prettier;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -46,6 +52,7 @@ public abstract class AbstractPrettierMojo extends AbstractMojo {
   private RepositorySystem repositorySystem;
 
   protected abstract String getPrettierCommand();
+  protected abstract void handlePrettierNonZeroExit(int status) throws MojoExecutionException, MojoFailureException;
 
   @Override
   public final void execute() throws MojoExecutionException, MojoFailureException {
@@ -54,11 +61,51 @@ public abstract class AbstractPrettierMojo extends AbstractMojo {
       return;
     }
 
-    System.out.println("Node: " + resolveNodeExecutable());
+    Path nodeExecutable = resolveNodeExecutable();
+
     Path targetDirectory = Paths.get(project.getBuild().getDirectory());
     extractPrettierJava(targetDirectory);
-    // resolve node/prettier/prettier-java
-    // run prettier via our node binary with prettier-java plugin
+
+    Path prettierBin = targetDirectory
+        .resolve("prettier-java")
+        .resolve("node_modules")
+        .resolve("prettier")
+        .resolve("bin-prettier.js");
+
+    Path prettierJavaPlugin = targetDirectory
+        .resolve("prettier-java")
+        .resolve("node_modules")
+        .resolve("prettier-plugin-java");
+
+    try {
+      List<String> command = new ArrayList<>();
+      command.add(nodeExecutable.toString());
+      command.add(prettierBin.toString());
+      command.add("--" + getPrettierCommand());
+      command.add("**/*.java");
+      command.add("--plugin=" + prettierJavaPlugin.toString());
+      Process process = new ProcessBuilder(command.toArray(new String[0]))
+          .redirectErrorStream(true)
+          .start();
+      BufferedReader output = new BufferedReader(
+          new InputStreamReader(process.getInputStream(), StandardCharsets.UTF_8)
+      );
+
+      while (true) {
+        final String line = output.readLine();
+        if (line == null) {
+          break;
+        }
+        getLog().info("[prettier] " + line);
+      }
+      final int status = process.waitFor();
+      output.close();
+      if (status != 0) {
+        handlePrettierNonZeroExit(status);
+      }
+    } catch (IOException | InterruptedException e) {
+      throw new MojoExecutionException("Error trying to run prettier-java", e);
+    }
   }
 
   private Path resolveNodeExecutable() throws MojoExecutionException {
@@ -70,9 +117,17 @@ public abstract class AbstractPrettierMojo extends AbstractMojo {
         pluginDescriptor.getVersion()
     );
 
+    if (getLog().isDebugEnabled()) {
+      getLog().debug("Resolving node artifact: " + nodeArtifact);
+    }
+
     File nodeExecutable = resolve(nodeArtifact).getFile();
     if (!nodeExecutable.setExecutable(true, false)) {
       throw new MojoExecutionException("Unable to make file executable: " + nodeExecutable);
+    }
+
+    if (getLog().isDebugEnabled()) {
+      getLog().debug("Resolved node artifact to: " + nodeExecutable);
     }
 
     return nodeExecutable.toPath();
@@ -87,8 +142,16 @@ public abstract class AbstractPrettierMojo extends AbstractMojo {
         pluginDescriptor.getVersion()
     );
 
+    if (getLog().isDebugEnabled()) {
+      getLog().debug("Resolving prettier-java artifact: " + prettierArtifact);
+    }
+
+
     File prettierZip = resolve(prettierArtifact).getFile();
     try {
+      if (getLog().isDebugEnabled()) {
+        getLog().debug("Extracting prettier-java to: " + extractionPath);
+      }
       new ZipFile(prettierZip).extractAll(extractionPath.toString());
     } catch (ZipException e) {
       throw new MojoExecutionException("Error extracting prettier: " + prettierZip, e);
