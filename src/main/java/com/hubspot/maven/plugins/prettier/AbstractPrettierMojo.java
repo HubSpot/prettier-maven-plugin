@@ -10,6 +10,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -180,7 +181,7 @@ public abstract class AbstractPrettierMojo extends AbstractMojo {
       return Paths.get(project.getBuild().getDirectory());
     } else {
       Path prettierPath = prettierArtifact.getFile().toPath();
-      String fileName = prettierPath.getFileName().toString();
+      String fileName = Objects.toString(prettierPath.getFileName());
       String directoryName = fileName.substring(0, fileName.lastIndexOf('.'));
       return prettierPath.resolveSibling(directoryName);
     }
