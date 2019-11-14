@@ -84,6 +84,7 @@ public abstract class AbstractPrettierMojo extends AbstractMojo {
       List<String> command = new ArrayList<>();
       command.add(nodeExecutable.toString());
       command.add(prettierBin.toString());
+      command.add("--color");
       command.add("--loglevel");
       command.add(prettierLogLevel);
       command.add("--print-width");
