@@ -66,16 +66,15 @@ public abstract class AbstractPrettierMojo extends AbstractMojo {
 
     Path nodeExecutable = resolveNodeExecutable();
 
-    Path targetDirectory = Paths.get(project.getBuild().getDirectory());
-    extractPrettierJava(targetDirectory);
+    Path prettierJavaDirectory = extractPrettierJava();
 
-    Path prettierBin = targetDirectory
+    Path prettierBin = prettierJavaDirectory
         .resolve("prettier-java")
         .resolve("node_modules")
         .resolve("prettier")
         .resolve("bin-prettier.js");
 
-    Path prettierJavaPlugin = targetDirectory
+    Path prettierJavaPlugin = prettierJavaDirectory
         .resolve("prettier-java")
         .resolve("node_modules")
         .resolve("prettier-plugin-java");
@@ -141,7 +140,7 @@ public abstract class AbstractPrettierMojo extends AbstractMojo {
     return nodeExecutable.toPath();
   }
 
-  private void extractPrettierJava(Path extractionPath) throws MojoExecutionException {
+  private Path extractPrettierJava() throws MojoExecutionException {
     Artifact prettierArtifact = new DefaultArtifact(
         pluginDescriptor.getGroupId(),
         pluginDescriptor.getArtifactId(),
@@ -154,15 +153,31 @@ public abstract class AbstractPrettierMojo extends AbstractMojo {
       getLog().debug("Resolving prettier-java artifact: " + prettierArtifact);
     }
 
+    Path extractionPath = determinePrettierJavaExtractionPath(prettierArtifact);
+    if (getLog().isDebugEnabled()) {
+      getLog().debug("Extracting prettier-java to: " + extractionPath);
+    }
 
     File prettierZip = resolve(prettierArtifact).getFile();
     try {
-      if (getLog().isDebugEnabled()) {
-        getLog().debug("Extracting prettier-java to: " + extractionPath);
-      }
       new ZipFile(prettierZip).extractAll(extractionPath.toString());
     } catch (ZipException e) {
       throw new MojoExecutionException("Error extracting prettier: " + prettierZip, e);
+    }
+
+    return extractionPath;
+  }
+
+  private Path determinePrettierJavaExtractionPath(Artifact prettierArtifact) {
+    // check for unresolved snapshot
+    if (prettierArtifact.isSnapshot() && prettierArtifact.getVersion().endsWith("-SNAPSHOT")) {
+      // in this case, extract into target dir since we can't trust the local repo
+      return Paths.get(project.getBuild().getDirectory());
+    } else {
+      return prettierArtifact
+          .getFile()
+          .toPath()
+          .resolveSibling(prettierArtifact.getVersion());
     }
   }
 
