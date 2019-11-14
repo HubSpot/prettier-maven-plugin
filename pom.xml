@@ -47,10 +47,21 @@
       <scope>provided</scope>
     </dependency>
     <dependency>
+      <groupId>org.apache.maven.resolver</groupId>
+      <artifactId>maven-resolver-api</artifactId>
+      <version>1.4.1</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
       <groupId>org.apache.maven.plugin-tools</groupId>
       <artifactId>maven-plugin-annotations</artifactId>
       <version>3.6.0</version>
       <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>net.lingala.zip4j</groupId>
+      <artifactId>zip4j</artifactId>
+      <version>2.2.4</version>
     </dependency>
   </dependencies>
 
@@ -97,7 +108,7 @@
             </configuration>
           </execution>
           <execution>
-            <id>attach-prettier</id>
+            <id>attach-prettier-java</id>
             <goals>
               <goal>attach-artifact</goal>
             </goals>
@@ -105,9 +116,9 @@
             <configuration>
               <artifacts>
                 <artifact>
-                  <file>src/main/binaries/prettier/1.19.1/prettier-1.19.1.zip</file>
+                  <file>src/main/binaries/prettier-java/0.4.0/prettier-java-0.4.0.zip</file>
                   <type>zip</type>
-                  <classifier>prettier-1.19.1</classifier>
+                  <classifier>prettier-java-0.4.0</classifier>
                 </artifact>
               </artifacts>
             </configuration>

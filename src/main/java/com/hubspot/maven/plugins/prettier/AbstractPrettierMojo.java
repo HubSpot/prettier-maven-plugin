@@ -2,6 +2,7 @@ package com.hubspot.maven.plugins.prettier;
 
 import java.io.File;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -18,9 +19,12 @@ import org.eclipse.aether.resolution.ArtifactRequest;
 import org.eclipse.aether.resolution.ArtifactResolutionException;
 import org.eclipse.aether.resolution.ArtifactResult;
 
+import net.lingala.zip4j.ZipFile;
+import net.lingala.zip4j.exception.ZipException;
+
 public abstract class AbstractPrettierMojo extends AbstractMojo {
 
-  @Parameter(defaultValue = "${project}", readonly = true, required = true)
+  @Parameter(defaultValue = "${project}", readonly = true, required = false)
   private MavenProject project;
 
   @Parameter(defaultValue = "false")
@@ -29,17 +33,17 @@ public abstract class AbstractPrettierMojo extends AbstractMojo {
   @Parameter(defaultValue = "12.13.0")
   private String nodeVersion;
 
-  @Parameter(defaultValue = "1.19.1")
-  private String prettierVersion;
+  @Parameter(defaultValue = "0.4.0")
+  private String prettierJavaVersion;
+
+  @Parameter(defaultValue = "${repositorySystemSession}", required = true, readonly = true)
+  private RepositorySystemSession repositorySystemSession;
 
   @Component
   private PluginDescriptor pluginDescriptor;
 
   @Component
   private RepositorySystem repositorySystem;
-
-  @Component
-  private RepositorySystemSession repositorySystemSession;
 
   protected abstract String getPrettierCommand();
 
@@ -50,6 +54,9 @@ public abstract class AbstractPrettierMojo extends AbstractMojo {
       return;
     }
 
+    System.out.println("Node: " + resolveNodeExecutable());
+    Path targetDirectory = Paths.get(project.getBuild().getDirectory());
+    extractPrettierJava(targetDirectory);
     // resolve node/prettier/prettier-java
     // run prettier via our node binary with prettier-java plugin
   }
@@ -63,8 +70,34 @@ public abstract class AbstractPrettierMojo extends AbstractMojo {
         pluginDescriptor.getVersion()
     );
 
+    File nodeExecutable = resolve(nodeArtifact).getFile();
+    if (!nodeExecutable.setExecutable(true, false)) {
+      throw new MojoExecutionException("Unable to make file executable: " + nodeExecutable);
+    }
+
+    return nodeExecutable.toPath();
+  }
+
+  private void extractPrettierJava(Path extractionPath) throws MojoExecutionException {
+    Artifact prettierArtifact = new DefaultArtifact(
+        pluginDescriptor.getGroupId(),
+        pluginDescriptor.getArtifactId(),
+        determinePrettierJavaClassifier(),
+        "zip",
+        pluginDescriptor.getVersion()
+    );
+
+    File prettierZip = resolve(prettierArtifact).getFile();
+    try {
+      new ZipFile(prettierZip).extractAll(extractionPath.toString());
+    } catch (ZipException e) {
+      throw new MojoExecutionException("Error extracting prettier: " + prettierZip, e);
+    }
+  }
+
+  private Artifact resolve(Artifact artifact) throws MojoExecutionException {
     ArtifactRequest artifactRequest = new ArtifactRequest()
-        .setArtifact(nodeArtifact)
+        .setArtifact(artifact)
         .setRepositories(project.getRemoteProjectRepositories());
 
     final ArtifactResult result;
@@ -74,18 +107,19 @@ public abstract class AbstractPrettierMojo extends AbstractMojo {
       throw new MojoExecutionException("Error resolving artifact: " + nodeVersion, e);
     }
 
-    File nodeExecutable = result.getArtifact().getFile();
-    if (!nodeExecutable.setExecutable(true, false)) {
-      throw new MojoExecutionException("Unable to make file executable: " + nodeExecutable);
-    }
+    return result.getArtifact();
+  }
 
-    return nodeExecutable.toPath();
+  private String determinePrettierJavaClassifier() {
+    return "prettier-java-" + prettierJavaVersion;
   }
 
   private String determineNodeClassifier() throws MojoExecutionException {
     String osFullName = System.getProperty("os.name");
     if (osFullName == null) {
       throw new MojoExecutionException("No os.name system property set");
+    } else {
+      osFullName = osFullName.toLowerCase();
     }
 
     final String osShortName;
