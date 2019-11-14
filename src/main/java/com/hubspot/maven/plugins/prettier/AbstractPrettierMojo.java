@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -153,12 +154,16 @@ public abstract class AbstractPrettierMojo extends AbstractMojo {
       getLog().debug("Resolving prettier-java artifact: " + prettierArtifact);
     }
 
+    prettierArtifact = resolve(prettierArtifact);
     Path extractionPath = determinePrettierJavaExtractionPath(prettierArtifact);
-    if (getLog().isDebugEnabled()) {
-      getLog().debug("Extracting prettier-java to: " + extractionPath);
+    if (Files.isDirectory(extractionPath)) {
+      getLog().info("Reusing cached prettier-java at: " + extractionPath);
+      return extractionPath;
+    } else {
+      getLog().info("Extracting prettier-java to: " + extractionPath);
     }
 
-    File prettierZip = resolve(prettierArtifact).getFile();
+    File prettierZip = prettierArtifact.getFile();
     try {
       new ZipFile(prettierZip).extractAll(extractionPath.toString());
     } catch (ZipException e) {
@@ -174,10 +179,10 @@ public abstract class AbstractPrettierMojo extends AbstractMojo {
       // in this case, extract into target dir since we can't trust the local repo
       return Paths.get(project.getBuild().getDirectory());
     } else {
-      return prettierArtifact
-          .getFile()
-          .toPath()
-          .resolveSibling(prettierArtifact.getVersion());
+      Path prettierPath = prettierArtifact.getFile().toPath();
+      String fileName = prettierPath.getFileName().toString();
+      String directoryName = fileName.substring(0, fileName.lastIndexOf('.'));
+      return prettierPath.resolveSibling(directoryName);
     }
   }
 
