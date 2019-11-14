@@ -42,6 +42,9 @@ public abstract class AbstractPrettierMojo extends AbstractMojo {
   @Parameter(defaultValue = "0.4.0")
   private String prettierJavaVersion;
 
+  @Parameter(defaultValue = "warn", property = "prettierLogLevel")
+  private String prettierLogLevel;
+
   @Parameter(defaultValue = "${repositorySystemSession}", required = true, readonly = true)
   private RepositorySystemSession repositorySystemSession;
 
@@ -81,27 +84,32 @@ public abstract class AbstractPrettierMojo extends AbstractMojo {
       List<String> command = new ArrayList<>();
       command.add(nodeExecutable.toString());
       command.add(prettierBin.toString());
+      command.add("--loglevel");
+      command.add(prettierLogLevel);
+      command.add("--print-width");
+      command.add("90");
       command.add("--" + getPrettierCommand());
       command.add("**/*.java");
       command.add("--plugin=" + prettierJavaPlugin.toString());
+
+      if (getLog().isDebugEnabled()) {
+        getLog().debug("Running prettier with args: " + command);
+      }
+
       Process process = new ProcessBuilder(command.toArray(new String[0]))
           .redirectErrorStream(true)
           .start();
-      BufferedReader output = new BufferedReader(
-          new InputStreamReader(process.getInputStream(), StandardCharsets.UTF_8)
-      );
-
-      while (true) {
-        final String line = output.readLine();
-        if (line == null) {
-          break;
+      try (InputStreamReader reader = new InputStreamReader(process.getInputStream(), StandardCharsets.UTF_8);
+           BufferedReader prettierOutput = new BufferedReader(reader)) {
+        String line;
+        while ((line = prettierOutput.readLine()) != null) {
+          getLog().info("[prettier] " + line);
         }
-        getLog().info("[prettier] " + line);
-      }
-      final int status = process.waitFor();
-      output.close();
-      if (status != 0) {
-        handlePrettierNonZeroExit(status);
+
+        int status = process.waitFor();
+        if (status != 0) {
+          handlePrettierNonZeroExit(status);
+        }
       }
     } catch (IOException | InterruptedException e) {
       throw new MojoExecutionException("Error trying to run prettier-java", e);
