@@ -12,6 +12,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import javax.annotation.Nullable;
+
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
@@ -43,6 +45,18 @@ public abstract class AbstractPrettierMojo extends AbstractMojo {
 
   @Parameter(defaultValue = "0.4.0")
   private String prettierJavaVersion;
+
+  @Nullable
+  @Parameter(property = "prettier.printWidth")
+  private String printWidth;
+
+  @Nullable
+  @Parameter(property = "prettier.tabWidth")
+  private String tabWidth;
+
+  @Nullable
+  @Parameter(property = "prettier.useTabs")
+  private Boolean useTabs;
 
   @Parameter(defaultValue = "${repositorySystemSession}", required = true, readonly = true)
   private RepositorySystemSession repositorySystemSession;
@@ -91,8 +105,18 @@ public abstract class AbstractPrettierMojo extends AbstractMojo {
       command.add(nodeExecutable.toString());
       command.add(prettierBin.toString());
       command.add("--color");
-      command.add("--print-width");
-      command.add("90");
+      if (printWidth != null) {
+        command.add("--print-width");
+        command.add(printWidth);
+      }
+      if (tabWidth != null) {
+        command.add("--tab-width");
+        command.add(tabWidth);
+      }
+      if (useTabs != null) {
+        command.add("--use-tabs");
+        command.add(useTabs.toString());
+      }
       command.add("--" + getPrettierCommand());
       command.add(glob);
       command.add("--plugin=" + prettierJavaPlugin.toString());
@@ -205,10 +229,10 @@ public abstract class AbstractPrettierMojo extends AbstractMojo {
     prettierArtifact = resolve(prettierArtifact);
     Path extractionPath = determinePrettierJavaExtractionPath(prettierArtifact);
     if (Files.isDirectory(extractionPath)) {
-      getLog().info("Reusing cached prettier-java at " + extractionPath);
+      getLog().debug("Reusing cached prettier-java at " + extractionPath);
       return extractionPath;
     } else {
-      getLog().info("Extracting prettier-java to " + extractionPath);
+      getLog().debug("Extracting prettier-java to " + extractionPath);
     }
 
     File prettierZip = prettierArtifact.getFile();
