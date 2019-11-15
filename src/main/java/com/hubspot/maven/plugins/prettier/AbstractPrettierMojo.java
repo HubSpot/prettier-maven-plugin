@@ -64,6 +64,12 @@ public abstract class AbstractPrettierMojo extends AbstractMojo {
       return;
     }
 
+    List<Path> inputDirectories = determineInputPaths();
+    if (inputDirectories.isEmpty()) {
+      getLog().info("No input directories found");
+      return;
+    }
+
     Path nodeExecutable = resolveNodeExecutable();
 
     Path prettierJavaDirectory = extractPrettierJava();
@@ -87,7 +93,7 @@ public abstract class AbstractPrettierMojo extends AbstractMojo {
       command.add("--print-width");
       command.add("90");
       command.add("--" + getPrettierCommand());
-      command.add(computeGlob());
+      command.add(computeGlob(inputDirectories));
       command.add("--plugin=" + prettierJavaPlugin.toString());
 
       if (getLog().isDebugEnabled()) {
@@ -114,14 +120,19 @@ public abstract class AbstractPrettierMojo extends AbstractMojo {
     }
   }
 
-  private String computeGlob() {
+  private List<Path> determineInputPaths() {
     List<String> inputPaths = new ArrayList<>();
     inputPaths.addAll(project.getCompileSourceRoots());
     inputPaths.addAll(project.getTestCompileSourceRoots());
 
-    String joinedPaths = inputPaths.stream()
+    return inputPaths.stream()
         .map(Paths::get)
         .filter(Files::isDirectory)
+        .collect(Collectors.toList());
+  }
+
+  private String computeGlob(List<Path> inputPaths) {
+    String joinedPaths = inputPaths.stream()
         .map(Path::toString)
         .collect(Collectors.joining(",", "{", "}"));
 
@@ -186,17 +197,18 @@ public abstract class AbstractPrettierMojo extends AbstractMojo {
   }
 
   private Path determinePrettierJavaExtractionPath(Artifact prettierArtifact) {
+    String directoryName = String.join(
+        "-",
+        prettierArtifact.getArtifactId(),
+        prettierArtifact.getVersion(),
+        prettierArtifact.getClassifier()
+    );
+
     // check for unresolved snapshot
     if (prettierArtifact.isSnapshot() && prettierArtifact.getVersion().endsWith("-SNAPSHOT")) {
       // in this case, extract into target dir since we can't trust the local repo
-      return Paths.get(project.getBuild().getDirectory());
+      return Paths.get(project.getBuild().getDirectory()).resolve(directoryName);
     } else {
-      String directoryName = String.join(
-          "-",
-          prettierArtifact.getArtifactId(),
-          prettierArtifact.getVersion(),
-          prettierArtifact.getClassifier()
-      );
       return prettierArtifact
           .getFile()
           .toPath()
