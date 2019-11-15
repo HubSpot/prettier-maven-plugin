@@ -117,9 +117,10 @@ public abstract class AbstractPrettierMojo extends AbstractMojo {
         while ((line = stderr.readLine()) != null) {
           if (line.contains("No matching files.")) {
             noMatchingFiles = true;
+          } else if (line.contains("error")) {
+            getLog().error(line);
           } else {
-            // TODO infer log level
-            getLog().info(line);
+            getLog().warn(line);
           }
         }
 
