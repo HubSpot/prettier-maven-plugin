@@ -43,9 +43,6 @@ public abstract class AbstractPrettierMojo extends AbstractMojo {
   @Parameter(defaultValue = "0.4.0")
   private String prettierJavaVersion;
 
-  @Parameter(defaultValue = "warn", property = "prettierLogLevel")
-  private String prettierLogLevel;
-
   @Parameter(defaultValue = "${repositorySystemSession}", required = true, readonly = true)
   private RepositorySystemSession repositorySystemSession;
 
@@ -56,6 +53,7 @@ public abstract class AbstractPrettierMojo extends AbstractMojo {
   private RepositorySystem repositorySystem;
 
   protected abstract String getPrettierCommand();
+  protected abstract void handlePrettierLogLine(String line);
   protected abstract void handlePrettierNonZeroExit(int status) throws MojoExecutionException, MojoFailureException;
 
   @Override
@@ -85,8 +83,6 @@ public abstract class AbstractPrettierMojo extends AbstractMojo {
       command.add(nodeExecutable.toString());
       command.add(prettierBin.toString());
       command.add("--color");
-      command.add("--loglevel");
-      command.add(prettierLogLevel);
       command.add("--print-width");
       command.add("90");
       command.add("--" + getPrettierCommand());
@@ -104,7 +100,7 @@ public abstract class AbstractPrettierMojo extends AbstractMojo {
            BufferedReader prettierOutput = new BufferedReader(reader)) {
         String line;
         while ((line = prettierOutput.readLine()) != null) {
-          getLog().info("[prettier] " + line);
+          handlePrettierLogLine(line);
         }
 
         int status = process.waitFor();

@@ -6,6 +6,7 @@ import org.apache.maven.plugins.annotations.Parameter;
 
 @Mojo(name = "check", requiresProject = false, threadSafe = true)
 public class CheckMojo extends AbstractPrettierMojo {
+  private static final String MESSAGE = "Code formatting issues found, please run prettier-java";
 
   @Parameter(defaultValue = "true")
   private boolean fail;
@@ -16,9 +17,24 @@ public class CheckMojo extends AbstractPrettierMojo {
   }
 
   @Override
+  protected void handlePrettierLogLine(String line) {
+    if (line.endsWith(".java")) {
+      String message = "Incorrectly formatted file: " + line;
+      if (fail) {
+        getLog().error(message);
+      } else {
+        getLog().warn(message);
+      }
+    }
+  }
+
+  @Override
   protected void handlePrettierNonZeroExit(int status) throws MojoFailureException {
-    throw new MojoFailureException(
-        "Code is not formatted properly"
-    );
+    if (fail) {
+      getLog().error(MESSAGE);
+      throw new MojoFailureException(MESSAGE);
+    } else {
+      getLog().warn(MESSAGE);
+    }
   }
 }
