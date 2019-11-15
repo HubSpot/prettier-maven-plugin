@@ -6,7 +6,7 @@ import java.util.regex.Pattern;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.Mojo;
 
-@Mojo(name = "write", requiresProject = false, threadSafe = true)
+@Mojo(name = "write", threadSafe = true)
 public class WriteMojo extends AbstractPrettierMojo {
   private static final Predicate<String> COLORIZED_LINE =
       Pattern.compile("(\\x9B|\\x1B\\[)[0-?]*[ -/]*[@-~]").asPredicate();

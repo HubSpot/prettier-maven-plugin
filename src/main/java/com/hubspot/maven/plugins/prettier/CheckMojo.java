@@ -4,7 +4,7 @@ import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 
-@Mojo(name = "check", requiresProject = false, threadSafe = true)
+@Mojo(name = "check", threadSafe = true)
 public class CheckMojo extends AbstractPrettierMojo {
   private static final String MESSAGE = "Code formatting issues found, please run prettier-java";
 

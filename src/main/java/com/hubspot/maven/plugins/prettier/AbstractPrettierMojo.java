@@ -10,6 +10,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -31,7 +32,7 @@ import net.lingala.zip4j.exception.ZipException;
 
 public abstract class AbstractPrettierMojo extends AbstractMojo {
 
-  @Parameter(defaultValue = "${project}", readonly = true, required = false)
+  @Parameter(defaultValue = "${project}", readonly = true, required = true)
   private MavenProject project;
 
   @Parameter(defaultValue = "false")
@@ -86,11 +87,11 @@ public abstract class AbstractPrettierMojo extends AbstractMojo {
       command.add("--print-width");
       command.add("90");
       command.add("--" + getPrettierCommand());
-      command.add("**/*.java");
+      command.add(computeGlob());
       command.add("--plugin=" + prettierJavaPlugin.toString());
 
       if (getLog().isDebugEnabled()) {
-        getLog().debug("Running prettier with args: " + command);
+        getLog().debug("Running prettier with args " + command);
       }
 
       Process process = new ProcessBuilder(command.toArray(new String[0]))
@@ -113,6 +114,20 @@ public abstract class AbstractPrettierMojo extends AbstractMojo {
     }
   }
 
+  private String computeGlob() {
+    List<String> inputPaths = new ArrayList<>();
+    inputPaths.addAll(project.getCompileSourceRoots());
+    inputPaths.addAll(project.getTestCompileSourceRoots());
+
+    String joinedPaths = inputPaths.stream()
+        .map(Paths::get)
+        .filter(Files::isDirectory)
+        .map(Path::toString)
+        .collect(Collectors.joining(",", "{", "}"));
+
+    return joinedPaths + "/**/*.java";
+  }
+
   private Path resolveNodeExecutable() throws MojoExecutionException {
     Artifact nodeArtifact = new DefaultArtifact(
         pluginDescriptor.getGroupId(),
@@ -123,16 +138,16 @@ public abstract class AbstractPrettierMojo extends AbstractMojo {
     );
 
     if (getLog().isDebugEnabled()) {
-      getLog().debug("Resolving node artifact: " + nodeArtifact);
+      getLog().debug("Resolving node artifact " + nodeArtifact);
     }
 
     File nodeExecutable = resolve(nodeArtifact).getFile();
     if (!nodeExecutable.setExecutable(true, false)) {
-      throw new MojoExecutionException("Unable to make file executable: " + nodeExecutable);
+      throw new MojoExecutionException("Unable to make file executable " + nodeExecutable);
     }
 
     if (getLog().isDebugEnabled()) {
-      getLog().debug("Resolved node artifact to: " + nodeExecutable);
+      getLog().debug("Resolved node artifact to " + nodeExecutable);
     }
 
     return nodeExecutable.toPath();
@@ -148,23 +163,23 @@ public abstract class AbstractPrettierMojo extends AbstractMojo {
     );
 
     if (getLog().isDebugEnabled()) {
-      getLog().debug("Resolving prettier-java artifact: " + prettierArtifact);
+      getLog().debug("Resolving prettier-java artifact " + prettierArtifact);
     }
 
     prettierArtifact = resolve(prettierArtifact);
     Path extractionPath = determinePrettierJavaExtractionPath(prettierArtifact);
     if (Files.isDirectory(extractionPath)) {
-      getLog().info("Reusing cached prettier-java at: " + extractionPath);
+      getLog().info("Reusing cached prettier-java at " + extractionPath);
       return extractionPath;
     } else {
-      getLog().info("Extracting prettier-java to: " + extractionPath);
+      getLog().info("Extracting prettier-java to " + extractionPath);
     }
 
     File prettierZip = prettierArtifact.getFile();
     try {
       new ZipFile(prettierZip).extractAll(extractionPath.toString());
     } catch (ZipException e) {
-      throw new MojoExecutionException("Error extracting prettier: " + prettierZip, e);
+      throw new MojoExecutionException("Error extracting prettier " + prettierZip, e);
     }
 
     return extractionPath;
@@ -198,7 +213,7 @@ public abstract class AbstractPrettierMojo extends AbstractMojo {
     try {
       result = repositorySystem.resolveArtifact(repositorySystemSession, artifactRequest);
     } catch (ArtifactResolutionException e) {
-      throw new MojoExecutionException("Error resolving artifact: " + nodeVersion, e);
+      throw new MojoExecutionException("Error resolving artifact " + nodeVersion, e);
     }
 
     return result.getArtifact();
@@ -224,7 +239,7 @@ public abstract class AbstractPrettierMojo extends AbstractMojo {
     } else if (osFullName.startsWith("windows")) {
       osShortName = "windows";
     } else {
-      throw new MojoExecutionException("Unknown os.name: " + osFullName);
+      throw new MojoExecutionException("Unknown os.name " + osFullName);
     }
 
     return "node-" + nodeVersion + "-" + osShortName;
