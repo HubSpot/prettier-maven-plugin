@@ -2,7 +2,7 @@
 
 Maven plugin for running [prettier-java](https://github.com/jhipster/prettier-java) during a build. Node, prettier, and prettier-java are bundled into the plugin.
 
-There is a `check` goal which (optionally) fails if code isn't formatted correctly, and a `write` goal which rewrites the source code. A common setup might be to use the `write` goal during local builds, and the `check` goal during CI builds.
+There is a `check` goal which (optionally) fails the build if code isn't formatted correctly, and a `write` goal which rewrites the source code in place. A common setup might be to use the `write` goal during local builds, and the `check` goal during CI builds.
 
 ### Example Usage
 
