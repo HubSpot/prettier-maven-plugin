@@ -22,7 +22,7 @@ This example will run the `check` goal inside of Travis CI, and the `write` goal
         <plugin>
           <groupId>com.hubspot.maven.plugins</groupId>
           <artifactId>prettier-maven-plugin</artifactId>
-          <version>0.2</version>
+          <version>0.4</version>
           <executions>
             <execution>
               <phase>validate</phase>
@@ -47,7 +47,7 @@ This example will run the `check` goal inside of Travis CI, and the `write` goal
         <plugin>
           <groupId>com.hubspot.maven.plugins</groupId>
           <artifactId>prettier-maven-plugin</artifactId>
-          <version>0.2</version>
+          <version>0.4</version>
           <executions>
             <execution>
               <phase>validate</phase>
@@ -64,6 +64,6 @@ This example will run the `check` goal inside of Travis CI, and the `write` goal
 ```
 
 You can also ran in a one-off fashion via the commandline:  
-`mvn com.hubspot.maven.plugins:prettier-maven-plugin:0.2:check`  
+`mvn com.hubspot.maven.plugins:prettier-maven-plugin:0.4:check`  
 or  
-`mvn com.hubspot.maven.plugins:prettier-maven-plugin:0.2:write`
+`mvn com.hubspot.maven.plugins:prettier-maven-plugin:0.4:write`
