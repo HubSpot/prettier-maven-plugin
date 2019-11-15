@@ -86,6 +86,7 @@ public abstract class AbstractPrettierMojo extends AbstractMojo {
         .resolve("prettier-plugin-java");
 
     try {
+      String glob = computeGlob(inputDirectories);
       List<String> command = new ArrayList<>();
       command.add(nodeExecutable.toString());
       command.add(prettierBin.toString());
@@ -93,7 +94,7 @@ public abstract class AbstractPrettierMojo extends AbstractMojo {
       command.add("--print-width");
       command.add("90");
       command.add("--" + getPrettierCommand());
-      command.add(computeGlob(inputDirectories));
+      command.add(glob);
       command.add("--plugin=" + prettierJavaPlugin.toString());
 
       if (getLog().isDebugEnabled()) {
@@ -101,18 +102,34 @@ public abstract class AbstractPrettierMojo extends AbstractMojo {
       }
 
       Process process = new ProcessBuilder(command.toArray(new String[0]))
-          .redirectErrorStream(true)
+          .directory(project.getBasedir())
           .start();
-      try (InputStreamReader reader = new InputStreamReader(process.getInputStream(), StandardCharsets.UTF_8);
-           BufferedReader prettierOutput = new BufferedReader(reader)) {
+      try (InputStreamReader stdoutReader = new InputStreamReader(process.getInputStream(), StandardCharsets.UTF_8);
+           BufferedReader stdout = new BufferedReader(stdoutReader);
+           InputStreamReader stderrReader = new InputStreamReader(process.getErrorStream(), StandardCharsets.UTF_8);
+           BufferedReader stderr = new BufferedReader(stderrReader)) {
         String line;
-        while ((line = prettierOutput.readLine()) != null) {
+        while ((line = stdout.readLine()) != null) {
           handlePrettierLogLine(line);
+        }
+
+        boolean noMatchingFiles = false;
+        while ((line = stderr.readLine()) != null) {
+          if (line.contains("No matching files.")) {
+            noMatchingFiles = true;
+          } else {
+            // TODO infer log level
+            getLog().info(line);
+          }
         }
 
         int status = process.waitFor();
         if (status != 0) {
-          handlePrettierNonZeroExit(status);
+          if (status == 2 && noMatchingFiles) {
+            getLog().info("No files found matching glob " + glob);
+          } else {
+            handlePrettierNonZeroExit(status);
+          }
         }
       }
     } catch (IOException | InterruptedException e) {
@@ -125,16 +142,23 @@ public abstract class AbstractPrettierMojo extends AbstractMojo {
     inputPaths.addAll(project.getCompileSourceRoots());
     inputPaths.addAll(project.getTestCompileSourceRoots());
 
+    Path basePath = project.getBasedir().toPath();
     return inputPaths.stream()
         .map(Paths::get)
         .filter(Files::isDirectory)
+        .map(basePath::relativize)
         .collect(Collectors.toList());
   }
 
   private String computeGlob(List<Path> inputPaths) {
-    String joinedPaths = inputPaths.stream()
-        .map(Path::toString)
-        .collect(Collectors.joining(",", "{", "}"));
+    final String joinedPaths;
+    if (inputPaths.size() > 1) {
+      joinedPaths = inputPaths.stream()
+          .map(Path::toString)
+          .collect(Collectors.joining(",", "{", "}"));
+    } else {
+      joinedPaths = inputPaths.get(0).toString();
+    }
 
     return joinedPaths + "/**/*.java";
   }

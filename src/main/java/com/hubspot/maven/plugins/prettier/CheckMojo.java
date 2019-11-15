@@ -1,5 +1,6 @@
 package com.hubspot.maven.plugins.prettier;
 
+import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
@@ -29,12 +30,18 @@ public class CheckMojo extends AbstractPrettierMojo {
   }
 
   @Override
-  protected void handlePrettierNonZeroExit(int status) throws MojoFailureException {
-    if (fail) {
-      getLog().error(MESSAGE);
-      throw new MojoFailureException(MESSAGE);
+  protected void handlePrettierNonZeroExit(int status) throws MojoFailureException, MojoExecutionException {
+    if (status == 1) {
+      if (fail) {
+        getLog().error(MESSAGE);
+        throw new MojoFailureException(MESSAGE);
+      } else {
+        getLog().warn(MESSAGE);
+      }
     } else {
-      getLog().warn(MESSAGE);
+      throw new MojoExecutionException(
+          "Error trying to run prettier-java: " + status
+      );
     }
   }
 }
