@@ -63,7 +63,7 @@ This example will run the `check` goal inside of Travis CI, and the `write` goal
 </profiles>
 ```
 
-You can also ran in a one-off fashion via the commandline:  
+You can also run in a one-off fashion via the commandline:  
 `mvn com.hubspot.maven.plugins:prettier-maven-plugin:0.4:check`  
 or  
 `mvn com.hubspot.maven.plugins:prettier-maven-plugin:0.4:write`
