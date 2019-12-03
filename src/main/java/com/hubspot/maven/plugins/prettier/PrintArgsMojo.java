@@ -12,7 +12,6 @@ import org.apache.maven.project.MavenProject;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
 
-// TODO share code with AbstractPrettierMojo
 @Mojo(name = "print-args", requiresProject = false)
 public class PrintArgsMojo extends AbstractMojo {
   @Parameter(defaultValue = "${project}", readonly = true, required = false)
