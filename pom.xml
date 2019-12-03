@@ -120,6 +120,11 @@
                   <type>zip</type>
                   <classifier>prettier-java-0.4.0</classifier>
                 </artifact>
+                <artifact>
+                  <file>src/main/binaries/prettier-java/beta/prettier-java-9169fd648466e94f442da69e5e17c2e23f3a57ca.zip</file>
+                  <type>zip</type>
+                  <classifier>prettier-java-9169fd648466e94f442da69e5e17c2e23f3a57ca</classifier>
+                </artifact>
               </artifacts>
             </configuration>
           </execution>

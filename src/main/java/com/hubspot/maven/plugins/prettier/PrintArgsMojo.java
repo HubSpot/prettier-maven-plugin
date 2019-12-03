@@ -20,7 +20,7 @@ public class PrintArgsMojo extends AbstractMojo {
   @Parameter(defaultValue = "12.13.0")
   private String nodeVersion;
 
-  @Parameter(defaultValue = "0.4.0")
+  @Parameter(defaultValue = "9169fd648466e94f442da69e5e17c2e23f3a57ca")
   private String prettierJavaVersion;
 
   @Nullable
