@@ -19,6 +19,11 @@ import org.eclipse.aether.resolution.ArtifactResolutionException;
 import org.eclipse.aether.resolution.ArtifactResult;
 
 public class PrettierUtils {
+  /**
+   * Prevent multi-threaded builds from reading/writing partial files
+   */
+  private static final Object RESOLUTION_LOCK = new Object();
+
   private final MavenProject project;
   private final String nodeVersion;
   private final String prettierJavaVersion;
@@ -130,7 +135,9 @@ public class PrettierUtils {
 
     final ArtifactResult result;
     try {
-      result = repositorySystem.resolveArtifact(repositorySystemSession, artifactRequest);
+      synchronized (RESOLUTION_LOCK) {
+        result = repositorySystem.resolveArtifact(repositorySystemSession, artifactRequest);
+      }
     } catch (ArtifactResolutionException e) {
       throw new MojoExecutionException("Error resolving artifact " + nodeVersion, e);
     }
