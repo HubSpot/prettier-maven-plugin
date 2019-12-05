@@ -32,7 +32,7 @@ public abstract class AbstractPrettierMojo extends AbstractMojo {
   @Parameter(defaultValue = "12.13.0", property = "prettier.nodeVersion")
   private String nodeVersion;
 
-  @Parameter(defaultValue = "9169fd648466e94f442da69e5e17c2e23f3a57ca")
+  @Parameter(defaultValue = "0.5.0")
   private String prettierJavaVersion;
 
   @Nullable
