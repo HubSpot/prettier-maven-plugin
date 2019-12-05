@@ -23,6 +23,7 @@ public class PrettierUtils {
    * Prevent multi-threaded builds from reading/writing partial files
    */
   private static final Object RESOLUTION_LOCK = new Object();
+  private static final Object EXTRACTION_LOCK = new Object();
 
   private final MavenProject project;
   private final String nodeVersion;
@@ -92,21 +93,24 @@ public class PrettierUtils {
 
     prettierArtifact = resolve(prettierArtifact);
     Path extractionPath = determinePrettierJavaExtractionPath(prettierArtifact);
-    if (Files.isDirectory(extractionPath)) {
-      log.debug("Reusing cached prettier-java at " + extractionPath);
+
+    synchronized (EXTRACTION_LOCK) {
+      if (Files.isDirectory(extractionPath)) {
+        log.debug("Reusing cached prettier-java at " + extractionPath);
+        return extractionPath;
+      } else {
+        log.debug("Extracting prettier-java to " + extractionPath);
+      }
+
+      File prettierZip = prettierArtifact.getFile();
+      try {
+        new ZipFile(prettierZip).extractAll(extractionPath.toString());
+      } catch (ZipException e) {
+        throw new MojoExecutionException("Error extracting prettier " + prettierZip, e);
+      }
+
       return extractionPath;
-    } else {
-      log.debug("Extracting prettier-java to " + extractionPath);
     }
-
-    File prettierZip = prettierArtifact.getFile();
-    try {
-      new ZipFile(prettierZip).extractAll(extractionPath.toString());
-    } catch (ZipException e) {
-      throw new MojoExecutionException("Error extracting prettier " + prettierZip, e);
-    }
-
-    return extractionPath;
   }
 
   private Path determinePrettierJavaExtractionPath(Artifact prettierArtifact) {
