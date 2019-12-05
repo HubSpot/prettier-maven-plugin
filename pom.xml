@@ -90,21 +90,6 @@
             <configuration>
               <artifacts>
                 <artifact>
-                  <file>src/main/binaries/node/8.16.2/node-8.16.2-linux</file>
-                  <type>exe</type>
-                  <classifier>node-8.16.2-linux</classifier>
-                </artifact>
-                <artifact>
-                  <file>src/main/binaries/node/8.16.2/node-8.16.2-mac_os_x</file>
-                  <type>exe</type>
-                  <classifier>node-8.16.2-mac_os_x</classifier>
-                </artifact>
-                <artifact>
-                  <file>src/main/binaries/node/8.16.2/node-8.16.2-windows.exe</file>
-                  <type>exe</type>
-                  <classifier>node-8.16.2-windows</classifier>
-                </artifact>
-                <artifact>
                   <file>src/main/binaries/node/10.17.0/node-10.17.0-linux</file>
                   <type>exe</type>
                   <classifier>node-10.17.0-linux</classifier>
