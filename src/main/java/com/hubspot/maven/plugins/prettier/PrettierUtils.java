@@ -119,7 +119,7 @@ public class PrettierUtils {
         throw new MojoExecutionException("Error creating temp directory: " + tempDir, e);
       }
 
-      log.debug("Extracting prettier-java to " + extractionPath);
+      log.debug("Extracting prettier-java to " + tempDir);
       File prettierZip = prettierArtifact.getFile();
       try {
         new ZipFile(prettierZip).extractAll(tempDir.toString());
@@ -127,6 +127,7 @@ public class PrettierUtils {
         throw new MojoExecutionException("Error extracting prettier " + prettierZip, e);
       }
 
+      log.debug("Copying prettier-java to " + extractionPath);
       try {
         Files.move(tempDir, extractionPath, StandardCopyOption.ATOMIC_MOVE);
       } catch (FileAlreadyExistsException | DirectoryNotEmptyException e) {
