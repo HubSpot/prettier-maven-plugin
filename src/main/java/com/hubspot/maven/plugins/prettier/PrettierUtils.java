@@ -131,9 +131,6 @@ public class PrettierUtils {
       log.debug("Copying prettier-java to " + extractionPath);
       try {
         Files.move(tempDir, extractionPath, StandardCopyOption.ATOMIC_MOVE);
-      } catch (FileAlreadyExistsException | DirectoryNotEmptyException e) {
-        // should be a harmless race condition
-        log.debug("Directory already created at: " + extractionPath);
       } catch (IOException e) {
         if (isIgnorableMoveError(e)) {
           // should be a harmless race condition
