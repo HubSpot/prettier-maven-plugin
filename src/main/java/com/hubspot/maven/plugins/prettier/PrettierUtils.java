@@ -1,9 +1,17 @@
 package com.hubspot.maven.plugins.prettier;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.DirectoryNotEmptyException;
+import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.nio.file.attribute.PosixFilePermission;
+import java.nio.file.attribute.PosixFilePermissions;
+import java.util.Set;
+import java.util.UUID;
 import net.lingala.zip4j.ZipFile;
 import net.lingala.zip4j.exception.ZipException;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -19,6 +27,7 @@ import org.eclipse.aether.resolution.ArtifactResolutionException;
 import org.eclipse.aether.resolution.ArtifactResult;
 
 public class PrettierUtils {
+  private static final Set<PosixFilePermission> GLOBAL_PERMISSIONS = PosixFilePermissions.fromString("rwxrwxrwx");
   /**
    * Prevent multi-threaded builds from reading/writing partial files
    */
@@ -98,15 +107,39 @@ public class PrettierUtils {
       if (Files.isDirectory(extractionPath)) {
         log.debug("Reusing cached prettier-java at " + extractionPath);
         return extractionPath;
-      } else {
-        log.debug("Extracting prettier-java to " + extractionPath);
       }
 
+      Path tempDir = extractionPath.resolveSibling(UUID.randomUUID().toString());
+      try {
+        Files.createDirectories(
+            extractionPath.resolveSibling(UUID.randomUUID().toString()),
+            PosixFilePermissions.asFileAttribute(GLOBAL_PERMISSIONS)
+        );
+      } catch (IOException e) {
+        throw new MojoExecutionException("Error creating temp directory: " + tempDir, e);
+      }
+
+      log.debug("Extracting prettier-java to " + extractionPath);
       File prettierZip = prettierArtifact.getFile();
       try {
-        new ZipFile(prettierZip).extractAll(extractionPath.toString());
+        new ZipFile(prettierZip).extractAll(tempDir.toString());
       } catch (ZipException e) {
         throw new MojoExecutionException("Error extracting prettier " + prettierZip, e);
+      }
+
+      try {
+        Files.move(tempDir, extractionPath, StandardCopyOption.ATOMIC_MOVE);
+      } catch (FileAlreadyExistsException | DirectoryNotEmptyException e) {
+        // should be a harmless race condition
+        log.debug("Directory already created at: " + extractionPath);
+      } catch (IOException e) {
+        String message = String.format(
+            "Error moving directory from %s to %s",
+            tempDir,
+            extractionPath
+        );
+
+        throw new MojoExecutionException(message);
       }
 
       return extractionPath;
