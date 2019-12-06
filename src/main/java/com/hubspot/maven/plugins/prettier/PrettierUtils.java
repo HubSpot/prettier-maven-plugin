@@ -112,7 +112,7 @@ public class PrettierUtils {
       Path tempDir = extractionPath.resolveSibling(UUID.randomUUID().toString());
       try {
         Files.createDirectories(
-            extractionPath.resolveSibling(UUID.randomUUID().toString()),
+            tempDir,
             PosixFilePermissions.asFileAttribute(GLOBAL_PERMISSIONS)
         );
       } catch (IOException e) {
