@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.DirectoryNotEmptyException;
 import java.nio.file.FileAlreadyExistsException;
+import java.nio.file.FileSystemException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -134,13 +135,18 @@ public class PrettierUtils {
         // should be a harmless race condition
         log.debug("Directory already created at: " + extractionPath);
       } catch (IOException e) {
-        String message = String.format(
-            "Error moving directory from %s to %s",
-            tempDir,
-            extractionPath
-        );
+        if (isIgnorableMoveError(e)) {
+          // should be a harmless race condition
+          log.debug("Directory already created at: " + extractionPath);
+        } else {
+          String message = String.format(
+              "Error moving directory from %s to %s",
+              tempDir,
+              extractionPath
+          );
 
-        throw new MojoExecutionException(message);
+          throw new MojoExecutionException(message, e);
+        }
       }
 
       return extractionPath;
@@ -207,5 +213,12 @@ public class PrettierUtils {
     }
 
     return "node-" + nodeVersion + "-" + osShortName;
+  }
+
+  private static boolean isIgnorableMoveError(IOException e) {
+    return e instanceof FileAlreadyExistsException ||
+           e instanceof DirectoryNotEmptyException ||
+           (e instanceof FileSystemException &&
+            e.getMessage().contains("Directory not empty"));
   }
 }
