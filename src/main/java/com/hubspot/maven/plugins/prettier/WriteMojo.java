@@ -2,14 +2,14 @@ package com.hubspot.maven.plugins.prettier;
 
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
-
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.Mojo;
 
 @Mojo(name = "write", threadSafe = true)
 public class WriteMojo extends AbstractPrettierMojo {
-  private static final Predicate<String> COLORIZED_LINE =
-      Pattern.compile("(\\x9B|\\x1B\\[)[0-?]*[ -/]*[@-~]").asPredicate();
+  private static final Predicate<String> COLORIZED_LINE = Pattern
+    .compile("(\\x9B|\\x1B\\[)[0-?]*[ -/]*[@-~]")
+    .asPredicate();
 
   @Override
   protected String getPrettierCommand() {
@@ -27,7 +27,7 @@ public class WriteMojo extends AbstractPrettierMojo {
   @Override
   protected void handlePrettierNonZeroExit(int status) throws MojoExecutionException {
     throw new MojoExecutionException(
-        "Error trying to format code with prettier-java: " + status
+      "Error trying to format code with prettier-java: " + status
     );
   }
 }

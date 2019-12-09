@@ -1,8 +1,8 @@
 package com.hubspot.maven.plugins.prettier;
 
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -12,9 +12,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import org.apache.maven.plugin.AbstractMojo;
+import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
-import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
@@ -35,6 +35,9 @@ public abstract class AbstractPrettierMojo extends AbstractMojo {
   @Parameter(defaultValue = "0.5.0")
   private String prettierJavaVersion;
 
+  @Parameter(defaultValue = "false")
+  private boolean extractPrettierToTargetDirectory;
+
   @Nullable
   @Parameter(property = "prettier.printWidth")
   private String printWidth;
@@ -47,7 +50,11 @@ public abstract class AbstractPrettierMojo extends AbstractMojo {
   @Parameter(property = "prettier.useTabs")
   private Boolean useTabs;
 
-  @Parameter(defaultValue = "${repositorySystemSession}", required = true, readonly = true)
+  @Parameter(
+    defaultValue = "${repositorySystemSession}",
+    required = true,
+    readonly = true
+  )
   private RepositorySystemSession repositorySystemSession;
 
   @Component
@@ -57,8 +64,11 @@ public abstract class AbstractPrettierMojo extends AbstractMojo {
   private RepositorySystem repositorySystem;
 
   protected abstract String getPrettierCommand();
+
   protected abstract void handlePrettierLogLine(String line);
-  protected abstract void handlePrettierNonZeroExit(int status) throws MojoExecutionException, MojoFailureException;
+
+  protected abstract void handlePrettierNonZeroExit(int status)
+    throws MojoExecutionException, MojoFailureException;
 
   @Override
   public final void execute() throws MojoExecutionException, MojoFailureException {
@@ -77,6 +87,7 @@ public abstract class AbstractPrettierMojo extends AbstractMojo {
       project,
       nodeVersion,
       prettierJavaVersion,
+      extractPrettierToTargetDirectory,
       repositorySystemSession,
       pluginDescriptor,
       repositorySystem,
@@ -88,15 +99,15 @@ public abstract class AbstractPrettierMojo extends AbstractMojo {
     Path prettierJavaDirectory = prettierUtils.extractPrettierJava();
 
     Path prettierBin = prettierJavaDirectory
-        .resolve("prettier-java")
-        .resolve("node_modules")
-        .resolve("prettier")
-        .resolve("bin-prettier.js");
+      .resolve("prettier-java")
+      .resolve("node_modules")
+      .resolve("prettier")
+      .resolve("bin-prettier.js");
 
     Path prettierJavaPlugin = prettierJavaDirectory
-        .resolve("prettier-java")
-        .resolve("node_modules")
-        .resolve("prettier-plugin-java");
+      .resolve("prettier-java")
+      .resolve("node_modules")
+      .resolve("prettier-plugin-java");
 
     try {
       String glob = computeGlob(inputDirectories);
@@ -125,12 +136,20 @@ public abstract class AbstractPrettierMojo extends AbstractMojo {
       }
 
       Process process = new ProcessBuilder(command.toArray(new String[0]))
-          .directory(project.getBasedir())
-          .start();
-      try (InputStreamReader stdoutReader = new InputStreamReader(process.getInputStream(), StandardCharsets.UTF_8);
-           BufferedReader stdout = new BufferedReader(stdoutReader);
-           InputStreamReader stderrReader = new InputStreamReader(process.getErrorStream(), StandardCharsets.UTF_8);
-           BufferedReader stderr = new BufferedReader(stderrReader)) {
+        .directory(project.getBasedir())
+        .start();
+      try (
+        InputStreamReader stdoutReader = new InputStreamReader(
+          process.getInputStream(),
+          StandardCharsets.UTF_8
+        );
+        BufferedReader stdout = new BufferedReader(stdoutReader);
+        InputStreamReader stderrReader = new InputStreamReader(
+          process.getErrorStream(),
+          StandardCharsets.UTF_8
+        );
+        BufferedReader stderr = new BufferedReader(stderrReader)
+      ) {
         String line;
         while ((line = stdout.readLine()) != null) {
           handlePrettierLogLine(line);
@@ -167,17 +186,20 @@ public abstract class AbstractPrettierMojo extends AbstractMojo {
     inputPaths.addAll(project.getTestCompileSourceRoots());
 
     Path basePath = project.getBasedir().toPath();
-    return inputPaths.stream()
-        .map(Paths::get)
-        .filter(Files::isDirectory)
-        .map(basePath::relativize)
-        .collect(Collectors.toList());
+    return inputPaths
+      .stream()
+      .map(Paths::get)
+      .filter(Files::isDirectory)
+      .map(basePath::relativize)
+      .collect(Collectors.toList());
   }
 
   private String computeGlob(List<Path> inputPaths) {
     final String joinedPaths;
     if (inputPaths.size() > 1) {
-      joinedPaths = inputPaths.stream()
+      joinedPaths =
+        inputPaths
+          .stream()
           .map(Path::toString)
           .collect(Collectors.joining(",", "{", "}"));
     } else {

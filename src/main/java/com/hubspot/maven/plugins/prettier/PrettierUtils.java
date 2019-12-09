@@ -2,33 +2,36 @@ package com.hubspot.maven.plugins.prettier;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.attribute.PosixFilePermission;
+import java.nio.file.attribute.PosixFilePermissions;
 import java.nio.file.DirectoryNotEmptyException;
 import java.nio.file.FileAlreadyExistsException;
-import java.nio.file.FileSystemException;
 import java.nio.file.Files;
+import java.nio.file.FileSystemException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import java.nio.file.attribute.PosixFilePermission;
-import java.nio.file.attribute.PosixFilePermissions;
 import java.util.Set;
 import java.util.UUID;
-import net.lingala.zip4j.ZipFile;
 import net.lingala.zip4j.exception.ZipException;
-import org.apache.maven.plugin.MojoExecutionException;
+import net.lingala.zip4j.ZipFile;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.plugin.logging.Log;
+import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
-import org.eclipse.aether.RepositorySystem;
-import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.artifact.DefaultArtifact;
+import org.eclipse.aether.RepositorySystem;
+import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.resolution.ArtifactRequest;
 import org.eclipse.aether.resolution.ArtifactResolutionException;
 import org.eclipse.aether.resolution.ArtifactResult;
 
 public class PrettierUtils {
-  private static final Set<PosixFilePermission> GLOBAL_PERMISSIONS = PosixFilePermissions.fromString("rwxrwxrwx");
+  private static final Set<PosixFilePermission> GLOBAL_PERMISSIONS = PosixFilePermissions.fromString(
+    "rwxrwxrwx"
+  );
+
   /**
    * Prevent multi-threaded builds from reading/writing partial files
    */
@@ -38,6 +41,7 @@ public class PrettierUtils {
   private final MavenProject project;
   private final String nodeVersion;
   private final String prettierJavaVersion;
+  private final boolean extractPrettierToTargetDirectory;
   private final RepositorySystemSession repositorySystemSession;
   private final PluginDescriptor pluginDescriptor;
   private final RepositorySystem repositorySystem;
@@ -47,6 +51,7 @@ public class PrettierUtils {
     MavenProject project,
     String nodeVersion,
     String prettierJavaVersion,
+    boolean extractPrettierToTargetDirectory,
     RepositorySystemSession repositorySystemSession,
     PluginDescriptor pluginDescriptor,
     RepositorySystem repositorySystem,
@@ -55,6 +60,7 @@ public class PrettierUtils {
     this.project = project;
     this.nodeVersion = nodeVersion;
     this.prettierJavaVersion = prettierJavaVersion;
+    this.extractPrettierToTargetDirectory = extractPrettierToTargetDirectory;
     this.repositorySystemSession = repositorySystemSession;
     this.pluginDescriptor = pluginDescriptor;
     this.repositorySystem = repositorySystem;
@@ -113,8 +119,8 @@ public class PrettierUtils {
       Path tempDir = extractionPath.resolveSibling(UUID.randomUUID().toString());
       try {
         Files.createDirectories(
-            tempDir,
-            PosixFilePermissions.asFileAttribute(GLOBAL_PERMISSIONS)
+          tempDir,
+          PosixFilePermissions.asFileAttribute(GLOBAL_PERMISSIONS)
         );
       } catch (IOException e) {
         throw new MojoExecutionException("Error creating temp directory: " + tempDir, e);
@@ -137,9 +143,9 @@ public class PrettierUtils {
           log.debug("Directory already created at: " + extractionPath);
         } else {
           String message = String.format(
-              "Error moving directory from %s to %s",
-              tempDir,
-              extractionPath
+            "Error moving directory from %s to %s",
+            tempDir,
+            extractionPath
           );
 
           throw new MojoExecutionException(message, e);
@@ -160,7 +166,11 @@ public class PrettierUtils {
 
     // check for unresolved snapshot
     if (
-      prettierArtifact.isSnapshot() && prettierArtifact.getVersion().endsWith("-SNAPSHOT")
+      (extractPrettierToTargetDirectory) ||
+      (
+        prettierArtifact.isSnapshot() &&
+        prettierArtifact.getVersion().endsWith("-SNAPSHOT")
+      )
     ) {
       // in this case, extract into target dir since we can't trust the local repo
       return Paths.get(project.getBuild().getDirectory()).resolve(directoryName);
@@ -177,7 +187,8 @@ public class PrettierUtils {
     final ArtifactResult result;
     try {
       synchronized (RESOLUTION_LOCK) {
-        result = repositorySystem.resolveArtifact(repositorySystemSession, artifactRequest);
+        result =
+          repositorySystem.resolveArtifact(repositorySystemSession, artifactRequest);
       }
     } catch (ArtifactResolutionException e) {
       throw new MojoExecutionException("Error resolving artifact " + nodeVersion, e);
@@ -213,9 +224,10 @@ public class PrettierUtils {
   }
 
   private static boolean isIgnorableMoveError(IOException e) {
-    return e instanceof FileAlreadyExistsException ||
-           e instanceof DirectoryNotEmptyException ||
-           (e instanceof FileSystemException &&
-            e.getMessage().contains("Directory not empty"));
+    return (
+      e instanceof FileAlreadyExistsException ||
+      e instanceof DirectoryNotEmptyException ||
+      (e instanceof FileSystemException && e.getMessage().contains("Directory not empty"))
+    );
   }
 }

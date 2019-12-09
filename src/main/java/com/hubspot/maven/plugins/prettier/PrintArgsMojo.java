@@ -3,8 +3,8 @@ package com.hubspot.maven.plugins.prettier;
 import java.nio.file.Path;
 import javax.annotation.Nullable;
 import org.apache.maven.plugin.AbstractMojo;
-import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
+import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
@@ -22,6 +22,9 @@ public class PrintArgsMojo extends AbstractMojo {
 
   @Parameter(defaultValue = "0.5.0")
   private String prettierJavaVersion;
+
+  @Parameter(defaultValue = "false")
+  private boolean extractPrettierToTargetDirectory;
 
   @Nullable
   @Parameter(property = "prettier.printWidth")
@@ -54,6 +57,7 @@ public class PrintArgsMojo extends AbstractMojo {
       project,
       nodeVersion,
       prettierJavaVersion,
+      extractPrettierToTargetDirectory,
       repositorySystemSession,
       pluginDescriptor,
       repositorySystem,

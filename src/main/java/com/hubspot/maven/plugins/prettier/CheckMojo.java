@@ -7,7 +7,8 @@ import org.apache.maven.plugins.annotations.Parameter;
 
 @Mojo(name = "check", threadSafe = true)
 public class CheckMojo extends AbstractPrettierMojo {
-  private static final String MESSAGE = "Code formatting issues found, please run prettier-java";
+  private static final String MESSAGE =
+    "Code formatting issues found, please run prettier-java";
 
   @Parameter(defaultValue = "true")
   private boolean fail;
@@ -30,7 +31,8 @@ public class CheckMojo extends AbstractPrettierMojo {
   }
 
   @Override
-  protected void handlePrettierNonZeroExit(int status) throws MojoFailureException, MojoExecutionException {
+  protected void handlePrettierNonZeroExit(int status)
+    throws MojoFailureException, MojoExecutionException {
     if (status == 1) {
       if (fail) {
         getLog().error(MESSAGE);
@@ -39,9 +41,7 @@ public class CheckMojo extends AbstractPrettierMojo {
         getLog().warn(MESSAGE);
       }
     } else {
-      throw new MojoExecutionException(
-          "Error trying to run prettier-java: " + status
-      );
+      throw new MojoExecutionException("Error trying to run prettier-java: " + status);
     }
   }
 }
