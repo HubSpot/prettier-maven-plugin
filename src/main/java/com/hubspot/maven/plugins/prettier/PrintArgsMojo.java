@@ -1,72 +1,17 @@
 package com.hubspot.maven.plugins.prettier;
 
 import java.nio.file.Path;
-import javax.annotation.Nullable;
-import org.apache.maven.plugin.AbstractMojo;
-import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.Mojo;
-import org.apache.maven.plugins.annotations.Parameter;
-import org.apache.maven.project.MavenProject;
-import org.eclipse.aether.RepositorySystem;
-import org.eclipse.aether.RepositorySystemSession;
 
 @Mojo(name = "print-args", requiresProject = false)
-public class PrintArgsMojo extends AbstractMojo {
-  @Parameter(defaultValue = "${project}", readonly = true, required = false)
-  private MavenProject project;
-
-  @Parameter(defaultValue = "12.13.0", property = "prettier.nodeVersion")
-  private String nodeVersion;
-
-  @Parameter(defaultValue = "0.5.0")
-  private String prettierJavaVersion;
-
-  @Parameter(defaultValue = "false")
-  private boolean extractPrettierToTargetDirectory;
-
-  @Nullable
-  @Parameter(property = "prettier.printWidth")
-  private String printWidth;
-
-  @Nullable
-  @Parameter(property = "prettier.tabWidth")
-  private String tabWidth;
-
-  @Nullable
-  @Parameter(property = "prettier.useTabs")
-  private Boolean useTabs;
-
-  @Parameter(
-    defaultValue = "${repositorySystemSession}",
-    required = true,
-    readonly = true
-  )
-  private RepositorySystemSession repositorySystemSession;
-
-  @Component
-  private PluginDescriptor pluginDescriptor;
-
-  @Component
-  private RepositorySystem repositorySystem;
+public class PrintArgsMojo extends PrettierArgs {
 
   @Override
   public final void execute() throws MojoExecutionException {
-    PrettierUtils prettierUtils = new PrettierUtils(
-      project,
-      nodeVersion,
-      prettierJavaVersion,
-      extractPrettierToTargetDirectory,
-      repositorySystemSession,
-      pluginDescriptor,
-      repositorySystem,
-      getLog()
-    );
+    Path nodeExecutable = resolveNodeExecutable();
 
-    Path nodeExecutable = prettierUtils.resolveNodeExecutable();
-
-    Path prettierJavaDirectory = prettierUtils.extractPrettierJava();
+    Path prettierJavaDirectory = extractPrettierJava();
 
     Path prettierBin = prettierJavaDirectory
       .resolve("prettier-java")

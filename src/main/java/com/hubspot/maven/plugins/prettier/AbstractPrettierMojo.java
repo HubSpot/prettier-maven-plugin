@@ -1,8 +1,8 @@
 package com.hubspot.maven.plugins.prettier;
 
 import java.io.BufferedReader;
-import java.io.InputStreamReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -10,58 +10,14 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
-import javax.annotation.Nullable;
-import org.apache.maven.plugin.AbstractMojo;
-import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
-import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.Parameter;
-import org.apache.maven.project.MavenProject;
-import org.eclipse.aether.RepositorySystem;
-import org.eclipse.aether.RepositorySystemSession;
 
-public abstract class AbstractPrettierMojo extends AbstractMojo {
-
-  @Parameter(defaultValue = "${project}", readonly = true, required = true)
-  private MavenProject project;
+public abstract class AbstractPrettierMojo extends PrettierArgs {
 
   @Parameter(defaultValue = "false")
   private boolean skip;
-
-  @Parameter(defaultValue = "12.13.0", property = "prettier.nodeVersion")
-  private String nodeVersion;
-
-  @Parameter(defaultValue = "0.5.0")
-  private String prettierJavaVersion;
-
-  @Parameter(defaultValue = "false")
-  private boolean extractPrettierToTargetDirectory;
-
-  @Nullable
-  @Parameter(property = "prettier.printWidth")
-  private String printWidth;
-
-  @Nullable
-  @Parameter(property = "prettier.tabWidth")
-  private String tabWidth;
-
-  @Nullable
-  @Parameter(property = "prettier.useTabs")
-  private Boolean useTabs;
-
-  @Parameter(
-    defaultValue = "${repositorySystemSession}",
-    required = true,
-    readonly = true
-  )
-  private RepositorySystemSession repositorySystemSession;
-
-  @Component
-  private PluginDescriptor pluginDescriptor;
-
-  @Component
-  private RepositorySystem repositorySystem;
 
   protected abstract String getPrettierCommand();
 
@@ -83,20 +39,9 @@ public abstract class AbstractPrettierMojo extends AbstractMojo {
       return;
     }
 
-    PrettierUtils prettierUtils = new PrettierUtils(
-      project,
-      nodeVersion,
-      prettierJavaVersion,
-      extractPrettierToTargetDirectory,
-      repositorySystemSession,
-      pluginDescriptor,
-      repositorySystem,
-      getLog()
-    );
+    Path nodeExecutable = resolveNodeExecutable();
 
-    Path nodeExecutable = prettierUtils.resolveNodeExecutable();
-
-    Path prettierJavaDirectory = prettierUtils.extractPrettierJava();
+    Path prettierJavaDirectory = extractPrettierJava();
 
     Path prettierBin = prettierJavaDirectory
       .resolve("prettier-java")
