@@ -131,14 +131,14 @@
             <configuration>
               <artifacts>
                 <artifact>
-                  <file>src/main/binaries/prettier-java/0.4.0/prettier-java-0.4.0.zip</file>
-                  <type>zip</type>
-                  <classifier>prettier-java-0.4.0</classifier>
-                </artifact>
-                <artifact>
                   <file>src/main/binaries/prettier-java/0.5.0/prettier-java-0.5.0.zip</file>
                   <type>zip</type>
                   <classifier>prettier-java-0.5.0</classifier>
+                </artifact>
+                <artifact>
+                  <file>src/main/binaries/prettier-java/beta/prettier-java-6cf5cfdf76550ab4418a6e900696ba35eaa0fbc8.zip</file>
+                  <type>zip</type>
+                  <classifier>prettier-java-6cf5cfdf76550ab4418a6e900696ba35eaa0fbc8</classifier>
                 </artifact>
               </artifacts>
             </configuration>
