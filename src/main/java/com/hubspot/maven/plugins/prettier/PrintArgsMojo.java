@@ -39,5 +39,11 @@ public class PrintArgsMojo extends PrettierArgs {
     if (useTabs != null) {
       System.out.println("useTabs=" + useTabs);
     }
+    if (ignoreConfigFile) {
+      System.out.println("noConfig=true");
+    }
+    if (ignoreEditorConfig) {
+      System.out.println("noEditorconfig=true");
+    }
   }
 }

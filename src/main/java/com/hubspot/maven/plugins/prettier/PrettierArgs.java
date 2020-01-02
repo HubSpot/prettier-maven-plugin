@@ -65,6 +65,12 @@ public abstract class PrettierArgs extends AbstractMojo {
   @Parameter(property = "prettier.useTabs")
   protected Boolean useTabs;
 
+  @Parameter(defaultValue = "false", property = "prettier.ignoreConfigFile")
+  protected boolean ignoreConfigFile;
+
+  @Parameter(defaultValue = "false", property = "prettier.ignoreEditorConfig")
+  protected boolean ignoreEditorConfig;
+
   @Parameter(
       defaultValue = "${repositorySystemSession}",
       required = true,

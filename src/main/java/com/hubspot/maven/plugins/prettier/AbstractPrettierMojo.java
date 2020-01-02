@@ -72,6 +72,12 @@ public abstract class AbstractPrettierMojo extends PrettierArgs {
         command.add("--use-tabs");
         command.add(useTabs.toString());
       }
+      if (ignoreConfigFile) {
+        command.add("--no-config");
+      }
+      if (ignoreEditorConfig) {
+        command.add("--no-editorconfig");
+      }
       command.add("--" + getPrettierCommand());
       command.add(glob);
       command.add("--plugin=" + prettierJavaPlugin.toString());
