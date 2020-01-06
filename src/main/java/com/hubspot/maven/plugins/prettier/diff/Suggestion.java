@@ -10,7 +10,7 @@ public class Suggestion {
   public Suggestion(String id, String patchTarget) {
     this.id = id;
     this.patchTarget = patchTarget;
-    this.fileName = Paths.get(patchTarget).getFileName().toString();
+    this.fileName = String.valueOf(Paths.get(patchTarget).getFileName());
   }
 
   public String getId() {
