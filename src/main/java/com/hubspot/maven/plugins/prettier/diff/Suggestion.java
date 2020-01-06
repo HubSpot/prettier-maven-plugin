@@ -2,19 +2,19 @@ package com.hubspot.maven.plugins.prettier.diff;
 
 public class Suggestion {
   private final String id;
-  private final String target;
+  private final String patchTarget;
 
-  public Suggestion(String id, String target) {
+  public Suggestion(String id, String patchTarget) {
     this.id = id;
-    this.target = target;
+    this.patchTarget = patchTarget;
   }
 
   public String getId() {
     return id;
   }
 
-  public String getTarget() {
-    return target;
+  public String getPatchTarget() {
+    return patchTarget;
   }
 
   public String getType() {
