@@ -26,6 +26,6 @@ public class Suggestion {
   }
 
   public String getDescription() {
-    return "Reformat " + fileName + " with prettier-java";
+    return "Reformat `" + fileName + "` with prettier-java";
   }
 }
