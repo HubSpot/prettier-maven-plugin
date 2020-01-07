@@ -1,18 +1,11 @@
 package com.hubspot.maven.plugins.prettier;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.hubspot.maven.plugins.prettier.diff.BuildFailure;
 import com.hubspot.maven.plugins.prettier.diff.DiffConfiguration;
-import com.hubspot.maven.plugins.prettier.diff.Suggestion;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
+import com.hubspot.maven.plugins.prettier.diff.DiffHandler;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Mojo;
@@ -56,7 +49,11 @@ public class CheckMojo extends AbstractPrettierMojo {
       if (incorrectlyFormattedFiles.isEmpty()) {
         throw new MojoExecutionException("Error trying to run prettier-java: " + status);
       } else {
-        handleDiff();
+        new DiffHandler(
+            diffConfiguration,
+            basePrettierCommand(),
+            getLog()
+        ).handle(incorrectlyFormattedFiles);
 
         if (fail) {
           getLog().error(MESSAGE);
@@ -67,73 +64,6 @@ public class CheckMojo extends AbstractPrettierMojo {
       }
     } else {
       throw new MojoExecutionException("Error trying to run prettier-java: " + status);
-    }
-  }
-
-  private void handleDiff() throws MojoExecutionException {
-    if (diffConfiguration.isGenerateDiff()) {
-      List<Suggestion> suggestions = new ArrayList<>();
-
-      for (Path fileToFormat : incorrectlyFormattedFiles) {
-        fileToFormat = fileToFormat.toAbsolutePath();
-        String uuid = UUID.randomUUID().toString();
-        Path workspace = Paths.get(System.getenv("WORKSPACE")).toAbsolutePath();
-        Path diffPath = Paths.get(System.getenv("VIEWABLE_BUILD_ARTIFACTS_DIR")).resolve(uuid + ".diff");
-        suggestions.add(new Suggestion(uuid, workspace.relativize(fileToFormat).toString()));
-
-        List<String> prettierArgs = new ArrayList<>(basePrettierCommand());
-        prettierArgs.add("'" + fileToFormat.toString() + "'");
-
-        String prettierCommand = String.join(" ", prettierArgs);
-        String diffCommand = String.format(
-            "%s | diff -u %s - > %s",
-            prettierCommand,
-            "'" + workspace.relativize(fileToFormat) + "'",
-            "'" + diffPath + "'"
-        );
-
-        getLog().debug("Going to generate diff with command: " + diffCommand);
-
-        try {
-          Process process = new ProcessBuilder("/bin/sh", "-c", diffCommand)
-              .directory(workspace.toFile())
-              .redirectErrorStream(true)
-              .start();
-
-          try (
-              InputStreamReader stdoutReader = new InputStreamReader(
-                  process.getInputStream(),
-                  StandardCharsets.UTF_8
-              );
-              BufferedReader stdout = new BufferedReader(stdoutReader);
-          ) {
-            String line;
-            while ((line = stdout.readLine()) != null) {
-              getLog().warn(line);
-            }
-
-            int status = process.waitFor();
-            if (status != 1) {
-              throw new MojoExecutionException(
-                  "Error trying to create diff with prettier-java: " + status
-              );
-            }
-          }
-        } catch (IOException | InterruptedException e) {
-          throw new MojoExecutionException(
-              "Error trying to create diff with prettier-java",
-              e
-          );
-        }
-      }
-
-      BuildFailure buildFailure = new BuildFailure(suggestions);
-      Path buildFailurePath = Paths.get(System.getenv("VIEWABLE_BUILD_ARTIFACTS_DIR")).resolve("prettier-java.buildfailurecause.json");
-      try {
-        new ObjectMapper().writeValue(buildFailurePath.toFile(), buildFailure);
-      } catch (IOException e) {
-        throw new MojoExecutionException("Error trying to generate JSON", e);
-      }
     }
   }
 }

@@ -1,16 +1,16 @@
 package com.hubspot.maven.plugins.prettier.diff;
 
-import java.nio.file.Paths;
+import java.nio.file.Path;
 
 public class Suggestion {
   private final String id;
   private final String patchTarget;
   private final String fileName;
 
-  public Suggestion(String id, String patchTarget) {
+  public Suggestion(String id, Path patchTarget) {
     this.id = id;
-    this.patchTarget = patchTarget;
-    this.fileName = String.valueOf(Paths.get(patchTarget).getFileName());
+    this.patchTarget = patchTarget.toString();
+    this.fileName = String.valueOf(patchTarget.getFileName());
   }
 
   public String getId() {
