@@ -19,7 +19,7 @@ public class CheckMojo extends AbstractPrettierMojo {
   @Parameter(defaultValue = "true")
   private boolean fail;
 
-  @Parameter(defaultValue = "true")
+  @Parameter(defaultValue = "false")
   private boolean generateDiff;
 
   @Parameter(
