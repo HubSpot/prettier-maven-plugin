@@ -24,6 +24,7 @@ public class DefaultDiffGenerator implements DiffGenerator {
         .toAbsolutePath();
 
     try {
+      Files.createDirectories(diffFile);
       Files.deleteIfExists(diffFile);
     } catch (IOException e) {
       throw new MojoExecutionException("Error deleting file " + diffFile, e);
