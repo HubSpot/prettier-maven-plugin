@@ -24,8 +24,9 @@ public class DefaultDiffGenerator implements DiffGenerator {
         .toAbsolutePath();
 
     try {
-      if (diffFile.getParent() != null) {
-        Files.createDirectories(diffFile.getParent());
+      Path diffDirectory = diffFile.getParent();
+      if (diffDirectory != null) {
+        Files.createDirectories(diffDirectory);
       }
       Files.deleteIfExists(diffFile);
     } catch (IOException e) {
