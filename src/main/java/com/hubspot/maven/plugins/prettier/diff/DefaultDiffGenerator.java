@@ -1,5 +1,7 @@
 package com.hubspot.maven.plugins.prettier.diff;
 
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -20,6 +22,12 @@ public class DefaultDiffGenerator implements DiffGenerator {
         .get(args.getProject().getBuild().getDirectory())
         .resolve("prettier-java.diff")
         .toAbsolutePath();
+
+    try {
+      Files.deleteIfExists(diffFile);
+    } catch (IOException e) {
+      throw new MojoExecutionException("Error deleting file " + diffFile, e);
+    }
 
     for (Path fileToFormat : args.getIncorrectlyFormattedFiles()) {
       fileToFormat = fileToFormat.toAbsolutePath();
