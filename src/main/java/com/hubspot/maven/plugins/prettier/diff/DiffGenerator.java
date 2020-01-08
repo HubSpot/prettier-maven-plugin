@@ -15,7 +15,7 @@ public interface DiffGenerator {
     log.debug("Going to generate diff with command: " + processBuilder.command());
 
     try {
-      Process process = processBuilder.start();
+      Process process = processBuilder.redirectErrorStream(true).start();
 
       try (
           InputStreamReader stdoutReader = new InputStreamReader(

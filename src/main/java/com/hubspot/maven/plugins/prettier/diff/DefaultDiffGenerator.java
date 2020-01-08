@@ -36,8 +36,7 @@ public class DefaultDiffGenerator implements DiffGenerator {
       );
 
       ProcessBuilder processBuilder = new ProcessBuilder("/bin/sh", "-c", diffCommand)
-          .directory(baseDir.toFile())
-          .redirectErrorStream(true);
+          .directory(baseDir.toFile());
 
       runDiffCommand(processBuilder, args.getLog());
     }
