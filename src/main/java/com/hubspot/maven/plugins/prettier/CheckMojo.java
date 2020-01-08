@@ -19,7 +19,7 @@ public class CheckMojo extends AbstractPrettierMojo {
   @Parameter(defaultValue = "true")
   private boolean fail;
 
-  @Parameter(defaultValue = "false")
+  @Parameter(defaultValue = "true")
   private boolean generateDiff;
 
   @Parameter(property = "prettier.diffGenerator", alias = "diffGenerator", defaultValue = "com.hubspot.maven.plugins.prettier.DefaultDiffGenerator")
