@@ -39,7 +39,7 @@ public class DefaultDiffGenerator implements DiffGenerator {
           .directory(baseDir.toFile())
           .redirectErrorStream(true);
 
-      DiffGenerator.runDiffCommand(processBuilder, args.getLog());
+      runDiffCommand(processBuilder, args.getLog());
     }
 
     args.getLog().info("Diff file generated at " + baseDir.relativize(diffFile));

@@ -11,7 +11,7 @@ import org.apache.maven.plugin.logging.Log;
 public interface DiffGenerator {
   void generateDiffs(GenerateDiffArgs args) throws MojoExecutionException, MojoFailureException;
 
-  static void runDiffCommand(ProcessBuilder processBuilder, Log log) throws MojoExecutionException {
+  default void runDiffCommand(ProcessBuilder processBuilder, Log log) throws MojoExecutionException {
     log.debug("Going to generate diff with command: " + processBuilder.command());
 
     try {
