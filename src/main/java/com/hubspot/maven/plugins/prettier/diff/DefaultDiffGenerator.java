@@ -1,9 +1,5 @@
 package com.hubspot.maven.plugins.prettier.diff;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -39,39 +35,11 @@ public class DefaultDiffGenerator implements DiffGenerator {
           quote(diffFile)
       );
 
-      args.getLog().debug("Going to generate diff with command: " + diffCommand);
+      ProcessBuilder processBuilder = new ProcessBuilder("/bin/sh", "-c", diffCommand)
+          .directory(baseDir.toFile())
+          .redirectErrorStream(true);
 
-      try {
-        Process process = new ProcessBuilder("/bin/sh", "-c", diffCommand)
-            .directory(baseDir.toFile())
-            .redirectErrorStream(true)
-            .start();
-
-        try (
-            InputStreamReader stdoutReader = new InputStreamReader(
-                process.getInputStream(),
-                StandardCharsets.UTF_8
-            );
-            BufferedReader stdout = new BufferedReader(stdoutReader);
-        ) {
-          String line;
-          while ((line = stdout.readLine()) != null) {
-            args.getLog().warn(line);
-          }
-
-          int status = process.waitFor();
-          if (status != 1) {
-            throw new MojoExecutionException(
-                "Error trying to create diff with prettier-java: " + status
-            );
-          }
-        }
-      } catch (IOException | InterruptedException e) {
-        throw new MojoExecutionException(
-            "Error trying to create diff with prettier-java",
-            e
-        );
-      }
+      DiffGenerator.runDiffCommand(processBuilder, args.getLog());
     }
 
     args.getLog().info("Diff file generated at " + baseDir.relativize(diffFile));
