@@ -1,7 +1,7 @@
 package com.hubspot.maven.plugins.prettier;
 
-import com.hubspot.maven.plugins.prettier.diff.DiffConfiguration;
-import com.hubspot.maven.plugins.prettier.diff.DiffHandler;
+import com.hubspot.maven.plugins.prettier.diff.DiffGenerator;
+import com.hubspot.maven.plugins.prettier.diff.GenerateDiffArgs;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -19,8 +19,11 @@ public class CheckMojo extends AbstractPrettierMojo {
   @Parameter(defaultValue = "true")
   private boolean fail;
 
-  @Parameter
-  private DiffConfiguration diffConfiguration = new DiffConfiguration();
+  @Parameter(defaultValue = "false")
+  private boolean generateDiff;
+
+  @Parameter(property = "prettier.diffGenerator", alias = "diffGenerator", defaultValue = "com.hubspot.maven.plugins.prettier.DefaultDiffGenerator")
+  private String diffGeneratorType;
 
   @Override
   protected String getPrettierCommand() {
@@ -45,25 +48,43 @@ public class CheckMojo extends AbstractPrettierMojo {
   @Override
   protected void handlePrettierNonZeroExit(int status)
     throws MojoFailureException, MojoExecutionException {
-    if (status == 1) {
-      if (incorrectlyFormattedFiles.isEmpty()) {
-        throw new MojoExecutionException("Error trying to run prettier-java: " + status);
-      } else {
-        new DiffHandler(
-            diffConfiguration,
-            basePrettierCommand(),
-            getLog()
-        ).handle(incorrectlyFormattedFiles);
-
-        if (fail) {
-          getLog().error(MESSAGE);
-          throw new MojoFailureException(MESSAGE);
-        } else {
-          getLog().warn(MESSAGE);
-        }
-      }
-    } else {
+    if (status != 1 || incorrectlyFormattedFiles.isEmpty()) {
       throw new MojoExecutionException("Error trying to run prettier-java: " + status);
+    }
+
+    if (generateDiff) {
+      generateDiff();
+    }
+
+    if (fail) {
+      getLog().error(MESSAGE);
+      throw new MojoFailureException(MESSAGE);
+    } else {
+      getLog().warn(MESSAGE);
+    }
+  }
+
+  private void generateDiff() throws MojoExecutionException, MojoFailureException {
+    DiffGenerator diffGenerator = instantiateDiffGenerator();
+    GenerateDiffArgs args = new GenerateDiffArgs(
+        incorrectlyFormattedFiles,
+        basePrettierCommand(),
+        project,
+        getLog()
+    );
+
+    diffGenerator.generateDiffs(args);
+  }
+
+  private DiffGenerator instantiateDiffGenerator() throws MojoExecutionException {
+    try {
+      return (DiffGenerator) Class.forName(diffGeneratorType).getDeclaredConstructor().newInstance();
+    } catch (ClassNotFoundException e) {
+      throw new MojoExecutionException("Unable to find diff generator implementation", e);
+    } catch (ReflectiveOperationException e) {
+      throw new MojoExecutionException("Unable to instantiate diff generator", e);
+    } catch (ClassCastException e) {
+      throw new MojoExecutionException("Must implement DiffGenerator interface", e);
     }
   }
 }
