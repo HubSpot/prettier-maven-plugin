@@ -21,7 +21,7 @@ public class DefaultDiffGenerator implements DiffGenerator {
         .toAbsolutePath();
 
     Path diffFile = Paths
-        .get(args.getProject().getBuild().getOutputDirectory())
+        .get(args.getProject().getBuild().getDirectory())
         .resolve("prettier-java.diff")
         .toAbsolutePath();
 
