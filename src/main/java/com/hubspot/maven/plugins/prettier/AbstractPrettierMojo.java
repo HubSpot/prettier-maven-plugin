@@ -39,48 +39,12 @@ public abstract class AbstractPrettierMojo extends PrettierArgs {
       return;
     }
 
-    Path nodeExecutable = resolveNodeExecutable();
-
-    Path prettierJavaDirectory = extractPrettierJava();
-
-    Path prettierBin = prettierJavaDirectory
-      .resolve("prettier-java")
-      .resolve("node_modules")
-      .resolve("prettier")
-      .resolve("bin-prettier.js");
-
-    Path prettierJavaPlugin = prettierJavaDirectory
-      .resolve("prettier-java")
-      .resolve("node_modules")
-      .resolve("prettier-plugin-java");
-
     try {
       String glob = computeGlob(inputDirectories);
-      List<String> command = new ArrayList<>();
-      command.add(nodeExecutable.toString());
-      command.add(prettierBin.toString());
-      command.add("--color");
-      if (printWidth != null) {
-        command.add("--print-width");
-        command.add(printWidth);
-      }
-      if (tabWidth != null) {
-        command.add("--tab-width");
-        command.add(tabWidth);
-      }
-      if (useTabs != null) {
-        command.add("--use-tabs");
-        command.add(useTabs.toString());
-      }
-      if (ignoreConfigFile) {
-        command.add("--no-config");
-      }
-      if (ignoreEditorConfig) {
-        command.add("--no-editorconfig");
-      }
+
+      List<String> command = new ArrayList<>(basePrettierCommand());
       command.add("--" + getPrettierCommand());
       command.add(glob);
-      command.add("--plugin=" + prettierJavaPlugin.toString());
 
       if (getLog().isDebugEnabled()) {
         getLog().debug("Running prettier with args " + command);
@@ -129,6 +93,49 @@ public abstract class AbstractPrettierMojo extends PrettierArgs {
     } catch (IOException | InterruptedException e) {
       throw new MojoExecutionException("Error trying to run prettier-java", e);
     }
+  }
+
+  protected List<String> basePrettierCommand() throws MojoExecutionException {
+    Path nodeExecutable = resolveNodeExecutable();
+
+    Path prettierJavaDirectory = extractPrettierJava();
+
+    Path prettierBin = prettierJavaDirectory
+        .resolve("prettier-java")
+        .resolve("node_modules")
+        .resolve("prettier")
+        .resolve("bin-prettier.js");
+
+    Path prettierJavaPlugin = prettierJavaDirectory
+        .resolve("prettier-java")
+        .resolve("node_modules")
+        .resolve("prettier-plugin-java");
+
+    List<String> command = new ArrayList<>();
+    command.add(nodeExecutable.toString());
+    command.add(prettierBin.toString());
+    command.add("--plugin=" + prettierJavaPlugin.toString());
+    command.add("--color");
+    if (printWidth != null) {
+      command.add("--print-width");
+      command.add(printWidth);
+    }
+    if (tabWidth != null) {
+      command.add("--tab-width");
+      command.add(tabWidth);
+    }
+    if (useTabs != null) {
+      command.add("--use-tabs");
+      command.add(useTabs.toString());
+    }
+    if (ignoreConfigFile) {
+      command.add("--no-config");
+    }
+    if (ignoreEditorConfig) {
+      command.add("--no-editorconfig");
+    }
+
+    return command;
   }
 
   private List<Path> determineInputPaths() {
