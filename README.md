@@ -64,6 +64,20 @@ This example will run the `check` goal inside of Travis CI, and the `write` goal
 ```
 
 You can also run in a one-off fashion via the commandline:  
-`mvn com.hubspot.maven.plugins:prettier-maven-plugin:0.5:check`  
+`mvn prettier:check`  
 or  
-`mvn com.hubspot.maven.plugins:prettier-maven-plugin:0.5:write`
+`mvn prettier:write`
+
+### Adding new versions of node
+
+You can download binaries for Linux/OSX/Windows from here:
+https://nodejs.org/en/about/releases/
+
+1. Make a new folder located at `src/main/binaries/node/{node-version}` and drop the binaries in there using the existing name formatting.
+2. Update the pom.xml to attach these new binaries
+
+### Adding new versions of prettier-java
+
+1. Run `./create-prettier-java-zip.sh {prettier-java-version}` which will spit out the location of a zip file
+2. Make a new folder located at `src/main/binaries/prettier-java/{prettier-java-version}` and copy the zip file under there
+3. Update the pom.xml to attach this zip file
