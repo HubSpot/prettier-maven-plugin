@@ -22,7 +22,7 @@ This example will run the `check` goal inside of Travis CI, and the `write` goal
         <plugin>
           <groupId>com.hubspot.maven.plugins</groupId>
           <artifactId>prettier-maven-plugin</artifactId>
-          <version>0.5</version>
+          <version>0.6</version>
           <executions>
             <execution>
               <phase>validate</phase>
@@ -47,7 +47,7 @@ This example will run the `check` goal inside of Travis CI, and the `write` goal
         <plugin>
           <groupId>com.hubspot.maven.plugins</groupId>
           <artifactId>prettier-maven-plugin</artifactId>
-          <version>0.5</version>
+          <version>0.6</version>
           <executions>
             <execution>
               <phase>validate</phase>
