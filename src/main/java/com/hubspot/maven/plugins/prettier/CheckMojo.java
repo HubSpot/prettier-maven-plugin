@@ -3,7 +3,6 @@ package com.hubspot.maven.plugins.prettier;
 import com.hubspot.maven.plugins.prettier.diff.DiffGenerator;
 import com.hubspot.maven.plugins.prettier.diff.GenerateDiffArgs;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -39,7 +38,12 @@ public class CheckMojo extends AbstractPrettierMojo {
   @Override
   protected void handlePrettierLogLine(String line) {
     if (line.endsWith(".java")) {
-      incorrectlyFormattedFiles.add(Paths.get(line));
+      Path baseDir = project
+          .getBasedir()
+          .toPath()
+          .toAbsolutePath();
+
+      incorrectlyFormattedFiles.add(baseDir.resolve(line));
       String message = "Incorrectly formatted file: " + line;
       if (fail) {
         getLog().error(message);
