@@ -9,6 +9,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.nio.file.attribute.FileAttribute;
 import java.nio.file.attribute.PosixFilePermission;
 import java.nio.file.attribute.PosixFilePermissions;
 import java.util.Set;
@@ -137,7 +138,7 @@ public abstract class PrettierArgs extends AbstractMojo {
       try {
         Files.createDirectories(
             tempDir,
-            PosixFilePermissions.asFileAttribute(GLOBAL_PERMISSIONS)
+            determineOperatingSystemFamily().getGlobalPermissions()
         );
       } catch (IOException e) {
         throw new MojoExecutionException("Error creating temp directory: " + tempDir, e);
@@ -182,13 +183,7 @@ public abstract class PrettierArgs extends AbstractMojo {
     );
 
     // check for unresolved snapshot
-    if (
-        (extractPrettierToTargetDirectory) ||
-        (
-            prettierArtifact.isSnapshot() &&
-            prettierArtifact.getVersion().endsWith("-SNAPSHOT")
-        )
-    ) {
+    if (extractPrettierToTargetDirectory || isUnresolvedSnapshot(prettierArtifact)) {
       // in this case, extract into target dir since we can't trust the local repo
       return Paths.get(project.getBuild().getDirectory()).resolve(directoryName);
     } else {
@@ -218,7 +213,36 @@ public abstract class PrettierArgs extends AbstractMojo {
     return "prettier-java-" + prettierJavaVersion;
   }
 
+  private enum OperatingSystemFamily {
+    LINUX("linux"), MAC_OS_X("mac_os_x"), WINDOWS("windows");
+
+    private String shortName;
+
+    OperatingSystemFamily(String shortName) {
+      this.shortName = shortName;
+    }
+
+    public String getShortName() {
+      return shortName;
+    }
+
+    public FileAttribute<?>[] getGlobalPermissions() {
+      if (this == WINDOWS) {
+        return new FileAttribute<?>[0];
+      } else {
+        return new FileAttribute<?>[] {
+            PosixFilePermissions.asFileAttribute(GLOBAL_PERMISSIONS)
+        };
+      }
+    }
+  }
+
   private String determineNodeClassifier() throws MojoExecutionException {
+    OperatingSystemFamily osFamily = determineOperatingSystemFamily();
+    return "node-" + nodeVersion + "-" + osFamily.getShortName();
+  }
+
+  private OperatingSystemFamily determineOperatingSystemFamily() throws MojoExecutionException {
     String osFullName = System.getProperty("os.name");
     if (osFullName == null) {
       throw new MojoExecutionException("No os.name system property set");
@@ -226,18 +250,15 @@ public abstract class PrettierArgs extends AbstractMojo {
       osFullName = osFullName.toLowerCase();
     }
 
-    final String osShortName;
     if (osFullName.startsWith("linux")) {
-      osShortName = "linux";
+      return OperatingSystemFamily.LINUX;
     } else if (osFullName.startsWith("mac os x")) {
-      osShortName = "mac_os_x";
+      return OperatingSystemFamily.MAC_OS_X;
     } else if (osFullName.startsWith("windows")) {
-      osShortName = "windows";
+      return OperatingSystemFamily.WINDOWS;
     } else {
       throw new MojoExecutionException("Unknown os.name " + osFullName);
     }
-
-    return "node-" + nodeVersion + "-" + osShortName;
   }
 
   private static boolean isIgnorableMoveError(IOException e) {
@@ -246,5 +267,9 @@ public abstract class PrettierArgs extends AbstractMojo {
         e instanceof DirectoryNotEmptyException ||
         (e instanceof FileSystemException && e.getMessage().contains("Directory not empty"))
     );
+  }
+
+  private static boolean isUnresolvedSnapshot(Artifact artifact) {
+    return artifact.isSnapshot() && artifact.getVersion().endsWith("-SNAPSHOT");
   }
 }
