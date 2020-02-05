@@ -68,7 +68,11 @@ You can also run in a one-off fashion via the commandline:
 or  
 `mvn prettier:write`
 
-### Adding new versions of node
+#### Developing the plugin
+
+For convenience, this plugin bundles Node, prettier, and prettier-java. Over time, these bundled dependencies will need to be kept up to date. Below are some directions for adding new versions of Node and prettier-java.
+
+#### Adding new versions of node
 
 You can download binaries for Linux/OSX/Windows from here:
 https://nodejs.org/en/about/releases/
@@ -76,7 +80,7 @@ https://nodejs.org/en/about/releases/
 1. Make a new folder located at `src/main/binaries/node/{node-version}` and drop the binaries in there using the existing name formatting.
 2. Update the pom.xml to attach these new binaries
 
-### Adding new versions of prettier-java
+#### Adding new versions of prettier-java
 
 1. Run `./create-prettier-java-zip.sh {prettier-java-version}` which will spit out the location of a zip file
 2. Make a new folder located at `src/main/binaries/prettier-java/{prettier-java-version}` and copy the zip file under there
