@@ -76,8 +76,8 @@ The plugin supports the following configuration options:
 | ---- | ---------------- | ------------- | ----------- |
 | skip | N/A | false | If set to true, plugin execution will be skipped |
 | fail | N/A | true | **Only appplies to `check` goal**. If set to true, the plugin execution will fail if any unformatted files are found |
-| generateDiff | N/A | false | **Does not work on Windows**. If set to true, a diff will be generated between the current code and the prettier-formatted code. |
-| diffGenerator | prettier.diffGenerator | _ | Can be used to supply a custom implementation of [`DiffGenerator`](https://github.com/HubSpot/prettier-maven-plugin/blob/master/src/main/java/com/hubspot/maven/plugins/prettier/diff/DiffGenerator.java)
+| generateDiff | N/A | false | **Only appplies to `check` goal. Default diff implementation does not work on Windows**. If set to true, a diff will be generated between the current code and the prettier-formatted code. |
+| diffGenerator | prettier.diffGenerator | _ | **Only appplies to `check` goal**. Can be used to supply a custom implementation of [`DiffGenerator`](https://github.com/HubSpot/prettier-maven-plugin/blob/master/src/main/java/com/hubspot/maven/plugins/prettier/diff/DiffGenerator.java)
 | nodeVersion | prettier.nodeVersion | 12.13.0 | Controls version of Node used to run prettier-java. Valid values can be found [here](https://github.com/HubSpot/prettier-maven-plugin/tree/master/src/main/binaries/node) |
 | prettierJavaVersion | prettier.prettierJavaVersion | 0.7.0 | Controls version of prettier-java that is used. Valid values can be found [here](https://github.com/HubSpot/prettier-maven-plugin/tree/master/src/main/binaries/prettier-java) |
 | printWidth | prettier.printWidth | `null` | If set, will be passed to prettier as `--print-width`. More information [here](https://prettier.io/docs/en/options.html#print-width) |
