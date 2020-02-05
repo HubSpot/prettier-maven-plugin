@@ -68,7 +68,25 @@ You can also run in a one-off fashion via the commandline:
 or  
 `mvn prettier:write`
 
-#### Developing the plugin
+### Configuration
+
+The plugin supports the following configuration options:
+
+| Name | -D property name | Default Value | Description |
+| ---- | ---------------- | ------------- | ----------- |
+| skip | N/A | false | If set to true, plugin execution will be skipped |
+| fail | N/A | true | **Only appplies to `check` goal**. If set to true, the plugin execution will fail if any unformatted files are found |
+| generateDiff | N/A | false | **Does not work on Windows**. If set to true, a diff will be generated between the current code and the prettier-formatted code. |
+| diffGenerator | prettier.diffGenerator | `com.hubspot.maven.plugins.prettier.diff.DefaultDiffGenerator` | Can be used to supply a custom implementation of [`DiffGenerator`](https://github.com/HubSpot/prettier-maven-plugin/blob/master/src/main/java/com/hubspot/maven/plugins/prettier/diff/DiffGenerator.java)
+| nodeVersion | prettier.nodeVersion | 12.13.0 | Controls version of Node used to run prettier-java. Valid values can be found [here](https://github.com/HubSpot/prettier-maven-plugin/tree/master/src/main/binaries/node) |
+| prettierJavaVersion | prettier.prettierJavaVersion | 0.7.0 | Controls version of prettier-java that is used. Valid values can be found [here](https://github.com/HubSpot/prettier-maven-plugin/tree/master/src/main/binaries/prettier-java) |
+| printWidth | prettier.printWidth | `null` | If set, will be passed to prettier as `--print-width`. More information [here](https://prettier.io/docs/en/options.html#print-width) |
+| tabWidth | prettier.tabWidth | `null` | If set, will be passed to prettier as `--tab-width`. More information [here](https://prettier.io/docs/en/options.html#tab-width) |
+| useTabs | prettier.useTabs | `null` | If set, will be passed to prettier as `--use-tabs`. More information [here](https://prettier.io/docs/en/options.html#tabs) |
+| ignoreConfigFile | prettier.ignoreConfigFile | `false` | If set to true, pretter will be invoked with `--no-config`. More information [here](https://prettier.io/docs/en/cli.html#--no-config) |
+| ignoreEditorConfig | prettier.ignoreEditorConfig | `false` | If set to true, pretter will be invoked with `--no-editorconfig`. More information [here](https://prettier.io/docs/en/cli.html#--no-editorconfig) |
+
+### Developing the plugin
 
 For convenience, this plugin bundles Node, prettier, and prettier-java. Over time, these bundled dependencies will need to be kept up to date. Below are some directions for adding new versions of Node and prettier-java.
 
