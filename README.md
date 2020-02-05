@@ -9,24 +9,36 @@ There is a `check` goal which (optionally) fails the build if code isn't formatt
 This example will run the `check` goal inside of Travis CI, and the `write` goal outside of Travis CI. You can update the profile activation conditions based on the CI tool you use.
 
 ```xml
+<properties>
+  <!-- By default just re-write code with prettier -->
+  <plugin.prettier.goal>write</plugin.prettier.goal>
+</properties>
+
 <build>
-  <pluginManagement>
-    <plugins>
-      <plugin>
-        <groupId>com.hubspot.maven.plugins</groupId>
-        <artifactId>prettier-maven-plugin</artifactId>
-        <version>0.7</version>
-        <configuration>
-          <printWidth>90</printWidth>
-          <tabWidth>2</tabWidth>
-          <useTabs>false</useTabs>
-          <ignoreConfigFile>true</ignoreConfigFile>
-          <ignoreEditorConfig>true</ignoreEditorConfig>
-        </configuration>
-      </plugin>
-    </plugins>
-  </pluginManagement>
+  <plugins>
+    <plugin>
+      <groupId>com.hubspot.maven.plugins</groupId>
+      <artifactId>prettier-maven-plugin</artifactId>
+      <version>0.7</version>
+      <configuration>
+        <printWidth>90</printWidth>
+        <tabWidth>2</tabWidth>
+        <useTabs>false</useTabs>
+        <ignoreConfigFile>true</ignoreConfigFile>
+        <ignoreEditorConfig>true</ignoreEditorConfig>
+      </configuration>
+      <executions>
+        <execution>
+          <phase>validate</phase>
+          <goals>
+            <goal>${plugin.prettier.goal}</goal>
+          </goals>
+        </execution>
+      </executions>      
+    </plugin>
+  </plugins>
 </build>
+
 <profiles>
   <profile>
     <id>travis</id>
@@ -35,46 +47,10 @@ This example will run the `check` goal inside of Travis CI, and the `write` goal
         <name>env.TRAVIS</name>
       </property>
     </activation>
-    <build>
-      <plugins>
-        <plugin>
-          <groupId>com.hubspot.maven.plugins</groupId>
-          <artifactId>prettier-maven-plugin</artifactId>
-          <executions>
-            <execution>
-              <phase>validate</phase>
-              <goals>
-                <goal>check</goal>
-              </goals>
-            </execution>
-          </executions>
-        </plugin>
-      </plugins>
-    </build>
-  </profile>
-  <profile>
-    <id>local</id>
-    <activation>
-      <property>
-        <name>!env.TRAVIS</name>
-      </property>
-    </activation>
-    <build>
-      <plugins>
-        <plugin>
-          <groupId>com.hubspot.maven.plugins</groupId>
-          <artifactId>prettier-maven-plugin</artifactId>
-          <executions>
-            <execution>
-              <phase>validate</phase>
-              <goals>
-                <goal>write</goal>
-              </goals>
-            </execution>
-          </executions>
-        </plugin>
-      </plugins>
-    </build>
+    <properties>
+      <!-- But in our CI environment we want to validate that code is formatted -->
+      <plugin.prettier.goal>check</plugin.prettier.goal>
+    </properties>
   </profile>
 </profiles>
 ```
