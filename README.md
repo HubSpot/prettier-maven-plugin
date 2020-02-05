@@ -62,7 +62,7 @@ or
 
 ### Configuration
 
-The plugin supports the following configuration options:
+If you want to customize the behavior of prettier, you can use a normal prettier configuration [file](https://prettier.io/docs/en/configuration.html). Alternatively, you can configure prettier directly via the Maven plugin using the following options:
 
 | Name | -D property name | Default Value | Description |
 | ---- | ---------------- | ------------- | ----------- |
