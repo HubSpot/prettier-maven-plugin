@@ -9,6 +9,24 @@ There is a `check` goal which (optionally) fails the build if code isn't formatt
 This example will run the `check` goal inside of Travis CI, and the `write` goal outside of Travis CI. You can update the profile activation conditions based on the CI tool you use.
 
 ```xml
+<build>
+  <pluginManagement>
+    <plugins>
+      <plugin>
+        <groupId>com.hubspot.maven.plugins</groupId>
+        <artifactId>prettier-maven-plugin</artifactId>
+        <version>0.7</version>
+        <configuration>
+          <printWidth>90</printWidth>
+          <tabWidth>2</tabWidth>
+          <useTabs>false</useTabs>
+          <ignoreConfigFile>true</ignoreConfigFile>
+          <ignoreEditorConfig>true</ignoreEditorConfig>
+        </configuration>
+      </plugin>
+    </plugins>
+  </pluginManagement>
+</build>
 <profiles>
   <profile>
     <id>travis</id>
@@ -22,7 +40,6 @@ This example will run the `check` goal inside of Travis CI, and the `write` goal
         <plugin>
           <groupId>com.hubspot.maven.plugins</groupId>
           <artifactId>prettier-maven-plugin</artifactId>
-          <version>0.7</version>
           <executions>
             <execution>
               <phase>validate</phase>
@@ -47,7 +64,6 @@ This example will run the `check` goal inside of Travis CI, and the `write` goal
         <plugin>
           <groupId>com.hubspot.maven.plugins</groupId>
           <artifactId>prettier-maven-plugin</artifactId>
-          <version>0.7</version>
           <executions>
             <execution>
               <phase>validate</phase>
