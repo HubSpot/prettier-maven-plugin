@@ -140,8 +140,9 @@ public abstract class AbstractPrettierMojo extends PrettierArgs {
 
   private List<Path> determineInputPaths() {
     List<String> inputPaths = new ArrayList<>();
-    inputPaths.addAll(project.getCompileSourceRoots());
-    inputPaths.addAll(project.getTestCompileSourceRoots());
+    // don't use compile source roots because it seems to include generated sources
+    inputPaths.add(project.getBuild().getSourceDirectory());
+    inputPaths.add(project.getBuild().getTestSourceDirectory());
 
     Path basePath = project.getBasedir().toPath();
     return inputPaths
