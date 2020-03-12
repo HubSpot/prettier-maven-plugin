@@ -112,9 +112,9 @@ public abstract class AbstractPrettierMojo extends PrettierArgs {
         .resolve("prettier-plugin-java");
 
     List<String> command = new ArrayList<>();
-    command.add(nodeExecutable.toString());
-    command.add(prettierBin.toString());
-    command.add("--plugin=" + prettierJavaPlugin.toString());
+    command.add(toString(nodeExecutable));
+    command.add(toString(prettierBin));
+    command.add("--plugin=" + toString(prettierJavaPlugin));
     command.add("--color");
     if (printWidth != null) {
       command.add("--print-width");
@@ -166,5 +166,10 @@ public abstract class AbstractPrettierMojo extends PrettierArgs {
     }
 
     return joinedPaths + "/**/*.java";
+  }
+
+  // Convert Windows Path to Unix style
+  private String toString(Path path) {
+    return path.toString().replace("\\", "/");
   }
 }
