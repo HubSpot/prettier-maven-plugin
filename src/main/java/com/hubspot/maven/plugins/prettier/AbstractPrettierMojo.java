@@ -128,6 +128,10 @@ public abstract class AbstractPrettierMojo extends PrettierArgs {
       command.add("--use-tabs");
       command.add(useTabs.toString());
     }
+    if (endOfLine != null) {
+      command.add("--end-of-line");
+      command.add(endOfLine);
+    }
     if (ignoreConfigFile) {
       command.add("--no-config");
     }
