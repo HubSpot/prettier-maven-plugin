@@ -10,7 +10,7 @@ fi
 dir=`mktemp -d -t prettier-java`
 cd $dir
 mkdir prettier-java && cd prettier-java
-echo "{\"dependencies\": {\"prettier\": \"1.18.2\", \"prettier-plugin-java\": \"$1\"}}" > package.json
+echo "{\"dependencies\": {\"prettier-plugin-java\": \"$1\"}}" > package.json
 npm install
 cd ..
 zip_name="prettier-java-$1.zip"
