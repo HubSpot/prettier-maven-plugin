@@ -155,6 +155,11 @@
                   <type>zip</type>
                   <classifier>prettier-java-6cf5cfdf76550ab4418a6e900696ba35eaa0fbc8</classifier>
                 </artifact>
+                <artifact>
+                  <file>src/main/binaries/prettier-java/beta/prettier-java-c08da7b2b0486f59980a01cb99c6f0756725450a.zip</file>
+                  <type>zip</type>
+                  <classifier>prettier-java-c08da7b2b0486f59980a01cb99c6f0756725450a</classifier>
+                </artifact>
               </artifacts>
             </configuration>
           </execution>
