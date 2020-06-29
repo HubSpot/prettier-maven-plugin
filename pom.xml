@@ -19,6 +19,14 @@
     <url>git@github.com:HubSpot/prettier-maven-plugin.git</url>
     <tag>HEAD</tag>
   </scm>
+  
+  <licenses>
+    <license>
+      <name>Apache License, Version 2.0</name>
+      <url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
 
   <properties>
     <basepom.check.skip-license>true</basepom.check.skip-license>
