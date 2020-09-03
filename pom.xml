@@ -19,7 +19,7 @@
     <url>git@github.com:HubSpot/prettier-maven-plugin.git</url>
     <tag>HEAD</tag>
   </scm>
-  
+
   <licenses>
     <license>
       <name>Apache License, Version 2.0</name>
@@ -157,6 +157,11 @@
                   <file>src/main/binaries/prettier-java/0.8.0/prettier-java-0.8.0.zip</file>
                   <type>zip</type>
                   <classifier>prettier-java-0.8.0</classifier>
+                </artifact>
+                <artifact>
+                  <file>src/main/binaries/prettier-java/beta/prettier-java-0.8.2-fixed.zip</file>
+                  <type>zip</type>
+                  <classifier>prettier-java-0.8.2-fixed</classifier>
                 </artifact>
                 <artifact>
                   <file>src/main/binaries/prettier-java/beta/prettier-java-a24aa13714b850ab3d0f4e3f07414137c33321a1.zip</file>
