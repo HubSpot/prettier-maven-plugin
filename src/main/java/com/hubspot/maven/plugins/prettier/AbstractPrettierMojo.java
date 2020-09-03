@@ -72,7 +72,7 @@ public abstract class AbstractPrettierMojo extends PrettierArgs {
 
         boolean noMatchingFiles = false;
         while ((line = stderr.readLine()) != null) {
-          if (line.contains("No matching files.")) {
+          if (line.contains("No matching files.") || line.contains("No files matching")) {
             noMatchingFiles = true;
           } else if (line.contains("error")) {
             getLog().error(line);
