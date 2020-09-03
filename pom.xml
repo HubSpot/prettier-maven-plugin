@@ -159,6 +159,11 @@
                   <classifier>prettier-java-0.8.0</classifier>
                 </artifact>
                 <artifact>
+                  <file>src/main/binaries/prettier-java/0.8.2/prettier-java-0.8.2.zip</file>
+                  <type>zip</type>
+                  <classifier>prettier-java-0.8.2</classifier>
+                </artifact>
+                <artifact>
                   <file>src/main/binaries/prettier-java/beta/prettier-java-0.8.2-fixed.zip</file>
                   <type>zip</type>
                   <classifier>prettier-java-0.8.2-fixed</classifier>
