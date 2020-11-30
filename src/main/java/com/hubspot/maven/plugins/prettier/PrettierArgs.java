@@ -54,6 +54,9 @@ public abstract class PrettierArgs extends AbstractMojo {
   @Parameter(defaultValue = "false")
   private boolean extractPrettierToTargetDirectory;
 
+  @Parameter(defaultValue = "${glob}", property = "glob")
+  protected String glob;
+
   @Nullable
   @Parameter(property = "prettier.printWidth")
   protected String printWidth;

@@ -26,6 +26,7 @@ This example will run the `check` goal inside of Travis CI, and the `write` goal
         <useTabs>false</useTabs>
         <ignoreConfigFile>true</ignoreConfigFile>
         <ignoreEditorConfig>true</ignoreEditorConfig>
+        <glob>**/*.java</glob>
       </configuration>
       <executions>
         <execution>
@@ -56,9 +57,9 @@ This example will run the `check` goal inside of Travis CI, and the `write` goal
 ```
 
 You can also run in a one-off fashion via the commandline:  
-`mvn prettier:check`  
+`mvn prettier:check -Dglob="**/*.java"`  
 or  
-`mvn prettier:write`
+`mvn prettier:write -Dglob="**/*.java"`
 
 ### Configuration
 
@@ -78,6 +79,7 @@ If you want to customize the behavior of prettier, you can use a normal prettier
 | endOfLine | prettier.endOfLine | `null` | If set, will be passed to prettier as `--end-of-line`. More information [here](https://prettier.io/docs/en/options.html#end-of-line) |
 | ignoreConfigFile | prettier.ignoreConfigFile | `false` | If set to true, pretter will be invoked with `--no-config`. More information [here](https://prettier.io/docs/en/cli.html#--no-config) |
 | ignoreEditorConfig | prettier.ignoreEditorConfig | `false` | If set to true, pretter will be invoked with `--no-editorconfig`. More information [here](https://prettier.io/docs/en/cli.html#--no-editorconfig) |
+| glob | prettier.glob | `**/*.java` | If set, will be passed to prettier as `--write/--check`. More information [here](https://prettier.io/docs/en/install.html#docsNav) |
 
 ### Developing the plugin
 

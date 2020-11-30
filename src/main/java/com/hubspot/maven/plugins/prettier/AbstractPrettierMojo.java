@@ -40,7 +40,10 @@ public abstract class AbstractPrettierMojo extends PrettierArgs {
     }
 
     try {
-      String glob = computeGlob(inputDirectories);
+      String glob = this.glob;
+      if(glob == null || glob.length() == 0) {
+        glob = computeGlob(inputDirectories);
+      }
 
       List<String> command = new ArrayList<>(basePrettierCommand());
       command.add("--" + getPrettierCommand());
