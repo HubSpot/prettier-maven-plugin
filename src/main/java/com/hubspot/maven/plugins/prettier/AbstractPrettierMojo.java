@@ -4,12 +4,9 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Parameter;
@@ -33,18 +30,16 @@ public abstract class AbstractPrettierMojo extends PrettierArgs {
       return;
     }
 
-    List<Path> inputDirectories = determineInputPaths();
-    if (inputDirectories.isEmpty()) {
-      getLog().info("No input directories found");
-      return;
-    }
-
     try {
-      String glob = computeGlob(inputDirectories);
+      List<String> globs = computeInputGlobs();
+      if (globs.isEmpty()) {
+        getLog().info("No input directories found");
+        return;
+      }
 
       List<String> command = new ArrayList<>(basePrettierCommand());
       command.add("--" + getPrettierCommand());
-      command.add(glob);
+      command.addAll(globs);
 
       if (getLog().isDebugEnabled()) {
         getLog().debug("Running prettier with args " + command);
@@ -84,7 +79,7 @@ public abstract class AbstractPrettierMojo extends PrettierArgs {
         int status = process.waitFor();
         if (status != 0) {
           if (status == 2 && noMatchingFiles) {
-            getLog().info("No files found matching glob " + glob);
+            getLog().info("No files found matching input globs: " + globs);
           } else {
             handlePrettierNonZeroExit(status);
           }
@@ -140,36 +135,6 @@ public abstract class AbstractPrettierMojo extends PrettierArgs {
     }
 
     return command;
-  }
-
-  private List<Path> determineInputPaths() {
-    List<String> inputPaths = new ArrayList<>();
-    // don't use compile source roots because it seems to include generated sources
-    inputPaths.add(project.getBuild().getSourceDirectory());
-    inputPaths.add(project.getBuild().getTestSourceDirectory());
-
-    Path basePath = project.getBasedir().toPath();
-    return inputPaths
-      .stream()
-      .map(Paths::get)
-      .filter(Files::isDirectory)
-      .map(basePath::relativize)
-      .collect(Collectors.toList());
-  }
-
-  private String computeGlob(List<Path> inputPaths) {
-    final String joinedPaths;
-    if (inputPaths.size() > 1) {
-      joinedPaths =
-        inputPaths
-          .stream()
-          .map(Path::toString)
-          .collect(Collectors.joining(",", "{", "}"));
-    } else {
-      joinedPaths = inputPaths.get(0).toString();
-    }
-
-    return joinedPaths + "/**/*.java";
   }
 
   // Convert Windows Path to Unix style

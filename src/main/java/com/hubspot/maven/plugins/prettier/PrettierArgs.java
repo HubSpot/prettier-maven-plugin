@@ -12,8 +12,11 @@ import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.FileAttribute;
 import java.nio.file.attribute.PosixFilePermission;
 import java.nio.file.attribute.PosixFilePermissions;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+
 import javax.annotation.Nullable;
 import net.lingala.zip4j.ZipFile;
 import net.lingala.zip4j.exception.ZipException;
@@ -75,6 +78,9 @@ public abstract class PrettierArgs extends AbstractMojo {
   @Nullable
   @Parameter(property = "prettier.endOfLine")
   protected String endOfLine;
+
+  @Parameter(property = "prettier.inputGlobs")
+  protected List<String> inputGlobs;
 
   @Parameter(
       defaultValue = "${repositorySystemSession}",
@@ -176,6 +182,31 @@ public abstract class PrettierArgs extends AbstractMojo {
 
       return extractionPath;
     }
+  }
+
+  protected List<String> computeInputGlobs() {
+    if (inputGlobs.isEmpty()) {
+      return defaultInputGlobs();
+    } else {
+      return inputGlobs;
+    }
+  }
+
+  private List<String> defaultInputGlobs() {
+    List<String> defaultGlobs = new ArrayList<>();
+
+    // don't use compile source roots because it seems to include generated sources
+    Path sourceDirectory = Paths.get(project.getBuild().getSourceDirectory());
+    Path testSourceDirectory = Paths.get(project.getBuild().getTestSourceDirectory());
+
+    if (Files.isDirectory(sourceDirectory)) {
+      defaultGlobs.add(project.getBasedir().toPath().relativize(sourceDirectory) + "/**/*.java");
+    }
+    if (Files.isDirectory(testSourceDirectory)) {
+      defaultGlobs.add(project.getBasedir().toPath().relativize(testSourceDirectory) + "/**/*.java");
+    }
+
+    return defaultGlobs;
   }
 
   private Path determinePrettierJavaExtractionPath(Artifact prettierArtifact) {
