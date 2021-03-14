@@ -48,5 +48,6 @@ public class PrintArgsMojo extends PrettierArgs {
     if (ignoreEditorConfig) {
       System.out.println("noEditorconfig=true");
     }
+    computeInputGlobs().forEach(inputGlob -> System.out.println("inputGlob=" + inputGlob));
   }
 }
