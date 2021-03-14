@@ -28,9 +28,9 @@ This example will run the `check` goal inside of Travis CI, and the `write` goal
         <ignoreEditorConfig>true</ignoreEditorConfig>
         <!-- Use <inputGlobs> to override the default input patterns -->
         <inputGlobs>
+          <!-- These are the default patterns, you can omit <inputGlobs> entirely unless you want to override them -->
           <inputGlob>src/main/java/**/*.java</inputGlob>
           <inputGlob>src/test/java/**/*.java</inputGlob>
-          <inputGlob>src/main/js/**/*.js</inputGlob>
         </inputGlobs>
       </configuration>
       <executions>
