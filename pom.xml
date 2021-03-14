@@ -193,6 +193,11 @@
                   <type>zip</type>
                   <classifier>prettier-java-1.0.1</classifier>
                 </artifact>
+                <artifact>
+                  <file>src/main/binaries/prettier-java/1.0.2/prettier-java-1.0.2.zip</file>
+                  <type>zip</type>
+                  <classifier>prettier-java-1.0.2</classifier>
+                </artifact>
               </artifacts>
             </configuration>
           </execution>
