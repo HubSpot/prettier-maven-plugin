@@ -26,6 +26,12 @@ This example will run the `check` goal inside of Travis CI, and the `write` goal
         <useTabs>false</useTabs>
         <ignoreConfigFile>true</ignoreConfigFile>
         <ignoreEditorConfig>true</ignoreEditorConfig>
+        <!-- Use <inputGlobs> to override the default input patterns -->
+        <inputGlobs>
+          <inputGlob>src/main/java/**/*.java</inputGlob>
+          <inputGlob>src/test/java/**/*.java</inputGlob>
+          <inputGlob>src/main/js/**/*.js</inputGlob>
+        </inputGlobs>
       </configuration>
       <executions>
         <execution>
@@ -60,6 +66,11 @@ You can also run in a one-off fashion via the commandline:
 or  
 `mvn prettier:write`
 
+You can also run `mvn prettier:print-args` in order to confirm the configuration values
+
+To format additional directories or file types via the commandline, you can pass a comma-separated list of patterns, for example:  
+`mvn prettier:write '-Dprettier.inputGlobs=src/main/java/**/*.java,src/test/java/**/*.java,src/main/js/**/*.js'`
+
 ### Configuration
 
 If you want to customize the behavior of prettier, you can use a normal prettier configuration [file](https://prettier.io/docs/en/configuration.html). Alternatively, you can configure prettier directly via the Maven plugin using the following options:
@@ -78,6 +89,7 @@ If you want to customize the behavior of prettier, you can use a normal prettier
 | endOfLine | prettier.endOfLine | `null` | If set, will be passed to prettier as `--end-of-line`. More information [here](https://prettier.io/docs/en/options.html#end-of-line) |
 | ignoreConfigFile | prettier.ignoreConfigFile | `false` | If set to true, pretter will be invoked with `--no-config`. More information [here](https://prettier.io/docs/en/cli.html#--no-config) |
 | ignoreEditorConfig | prettier.ignoreEditorConfig | `false` | If set to true, pretter will be invoked with `--no-editorconfig`. More information [here](https://prettier.io/docs/en/cli.html#--no-editorconfig) |
+| inputGlobs | prettier.inputGlobs | `src/main/java/**/*.java,src/test/java/**/*.java` | Controls the input paths passed to prettier, useful for formatting additional directories or file types. More information [here](https://prettier.io/docs/en/cli.html#file-patterns) |
 
 ### Developing the plugin
 
