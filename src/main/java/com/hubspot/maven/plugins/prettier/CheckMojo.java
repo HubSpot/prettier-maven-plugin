@@ -38,6 +38,8 @@ public class CheckMojo extends AbstractPrettierMojo {
   @Override
   protected void handlePrettierLogLine(String line) {
     if (line.endsWith(".java")) {
+      line = trimLogLevel(line);
+
       Path baseDir = project
           .getBasedir()
           .toPath()
@@ -93,6 +95,14 @@ public class CheckMojo extends AbstractPrettierMojo {
       throw new MojoExecutionException("Unable to instantiate diff generator", e);
     } catch (ClassCastException e) {
       throw new MojoExecutionException("Must implement DiffGenerator interface", e);
+    }
+  }
+
+  private static String trimLogLevel(String line) {
+    if (line.contains("]")) {
+      return line.substring(line.indexOf(']') + 2);
+    } else {
+      return line;
     }
   }
 }

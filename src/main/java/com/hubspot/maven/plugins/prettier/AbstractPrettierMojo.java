@@ -72,7 +72,7 @@ public abstract class AbstractPrettierMojo extends PrettierArgs {
           } else if (line.contains("error")) {
             getLog().error(line);
           } else {
-            getLog().warn(line);
+            handlePrettierLogLine(line);
           }
         }
 
