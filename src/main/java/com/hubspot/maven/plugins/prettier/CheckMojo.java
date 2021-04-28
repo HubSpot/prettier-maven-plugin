@@ -100,6 +100,7 @@ public class CheckMojo extends AbstractPrettierMojo {
 
   private static String trimLogLevel(String line) {
     if (line.contains("]")) {
+      // converts something like '[warn] src/main/java/Test.java' -> 'src/main/java/Test.java'
       return line.substring(line.indexOf(']') + 2);
     } else {
       return line;
