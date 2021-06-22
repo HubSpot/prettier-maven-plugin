@@ -19,9 +19,9 @@ This example will run the `check` goal inside of Travis CI, and the `write` goal
     <plugin>
       <groupId>com.hubspot.maven.plugins</groupId>
       <artifactId>prettier-maven-plugin</artifactId>
-      <version>0.13</version>
+      <version>0.14</version>
       <configuration>
-        <prettierJavaVersion>1.0.2</prettierJavaVersion>
+        <prettierJavaVersion>1.3.0</prettierJavaVersion>
         <printWidth>90</printWidth>
         <tabWidth>2</tabWidth>
         <useTabs>false</useTabs>
