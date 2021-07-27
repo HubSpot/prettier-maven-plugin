@@ -23,6 +23,10 @@ public abstract class AbstractPrettierMojo extends PrettierArgs {
   protected abstract void handlePrettierNonZeroExit(int status)
     throws MojoExecutionException, MojoFailureException;
 
+  protected abstract void handlePrettierFinished() throws MojoFailureException, MojoExecutionException;
+
+  protected List<String> globSuffixes = new ArrayList<>();
+
   @Override
   public final void execute() throws MojoExecutionException, MojoFailureException {
     if (skip) {
@@ -36,6 +40,15 @@ public abstract class AbstractPrettierMojo extends PrettierArgs {
         getLog().info("No input directories found");
         return;
       }
+
+      globs.forEach(g -> {
+        if (g.contains(".")) {
+          globSuffixes.add(g.substring(g.lastIndexOf('.')));
+        }
+        else {
+          globSuffixes.add(g);
+        }
+      });
 
       List<String> command = new ArrayList<>(basePrettierCommand());
       command.add("--" + getPrettierCommand());
@@ -79,11 +92,12 @@ public abstract class AbstractPrettierMojo extends PrettierArgs {
         int status = process.waitFor();
         if (status != 0) {
           if (status == 2 && noMatchingFiles) {
-            getLog().info("No files found matching input globs: " + globs);
+            getLog().info("No files found matching at least one of the input globs: " + globs);
           } else {
             handlePrettierNonZeroExit(status);
           }
         }
+        handlePrettierFinished();
       }
     } catch (IOException | InterruptedException e) {
       throw new MojoExecutionException("Error trying to run prettier-java", e);
