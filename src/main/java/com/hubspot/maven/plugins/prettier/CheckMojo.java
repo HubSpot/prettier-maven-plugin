@@ -5,6 +5,7 @@ import com.hubspot.maven.plugins.prettier.diff.GenerateDiffArgs;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Mojo;
@@ -35,9 +36,17 @@ public class CheckMojo extends AbstractPrettierMojo {
 
   private final List<Path> incorrectlyFormattedFiles = new ArrayList<>();
 
+  private boolean hasErroredFiles = false;
+
   @Override
   protected void handlePrettierLogLine(String line) {
-    if (line.endsWith(".java")) {
+    // As a fallback if we see that prettier told use there are code
+    // style issues then keep track of that fact even if we don't find any
+    // files with a proper suffix from the log lines
+    if (line.toLowerCase().contains("code style issues found")) {
+      hasErroredFiles = true;
+    }
+    if (hasGlobSuffix(line)) {
       line = trimLogLevel(line);
 
       Path baseDir = project
@@ -56,6 +65,20 @@ public class CheckMojo extends AbstractPrettierMojo {
   }
 
   @Override
+  protected void handlePrettierFinished()
+    throws MojoFailureException, MojoExecutionException {
+    // Prettier has finished and it has been determined that
+    // we have errors so handle them as if there was a non zero exit
+    if (hasErroredFiles || incorrectlyFormattedFiles.size() > 0) {
+      handlePrettierNonZeroExit(1);
+    }
+  }
+
+  protected boolean hasGlobSuffix(final String line) {
+    return globSuffixes.stream().anyMatch(line::endsWith);
+  }
+
+  @Override
   protected void handlePrettierNonZeroExit(int status)
     throws MojoFailureException, MojoExecutionException {
     if (status != 1 || incorrectlyFormattedFiles.isEmpty()) {
@@ -66,11 +89,16 @@ public class CheckMojo extends AbstractPrettierMojo {
       generateDiff();
     }
 
+    final String fullMessage = MESSAGE + ".  Found the following improperly formatte4d files:" +
+            incorrectlyFormattedFiles
+                    .stream()
+                    .map(Path::toString)
+                    .collect(Collectors.joining("\n", "\n", "\n"));
     if (fail) {
-      getLog().error(MESSAGE);
+      getLog().error(fullMessage);
       throw new MojoFailureException(MESSAGE);
     } else {
-      getLog().warn(MESSAGE);
+      getLog().warn(fullMessage);
     }
   }
 

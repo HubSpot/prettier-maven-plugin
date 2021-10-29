@@ -30,4 +30,8 @@ public class WriteMojo extends AbstractPrettierMojo {
       "Error trying to format code with prettier-java: " + status
     );
   }
+
+  @Override
+  protected void handlePrettierFinished() {
+  }
 }
