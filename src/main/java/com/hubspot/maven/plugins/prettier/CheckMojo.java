@@ -55,8 +55,8 @@ public class CheckMojo extends AbstractPrettierMojo {
   @Override
   protected void handlePrettierNonZeroExit(int status)
     throws MojoFailureException, MojoExecutionException {
-    if (status != 1 || incorrectlyFormattedFiles.isEmpty()) {
-      throw new MojoExecutionException("Error trying to run prettier-java: " + status);
+    if (incorrectlyFormattedFiles.isEmpty()) {
+      return;
     }
 
     if (generateDiff) {
@@ -102,20 +102,5 @@ public class CheckMojo extends AbstractPrettierMojo {
         .toAbsolutePath();
 
     return baseDir.resolve(relativePath);
-  }
-
-  private static String trimLogLevel(String line) {
-    int closeBracketIndex = line.indexOf(']');
-    if (closeBracketIndex < 0) {
-      return line;
-    }
-
-    int startFileIndex = closeBracketIndex + "] ".length();
-    if (startFileIndex >= line.length()) {
-      return line;
-    }
-
-    // converts something like '[warn] src/main/java/Test.java' -> 'src/main/java/Test.java'
-    return line.substring(startFileIndex);
   }
 }

@@ -25,9 +25,5 @@ public class WriteMojo extends AbstractPrettierMojo {
   }
 
   @Override
-  protected void handlePrettierNonZeroExit(int status) throws MojoExecutionException {
-    throw new MojoExecutionException(
-      "Error trying to format code with prettier-java: " + status
-    );
-  }
+  protected void handlePrettierNonZeroExit(int status) {}
 }
