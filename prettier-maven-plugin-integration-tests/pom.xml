@@ -10,6 +10,10 @@
 
   <artifactId>prettier-maven-plugin-integration-tests</artifactId>
 
+  <properties>
+    <basepom.test.timeout>240</basepom.test.timeout>
+  </properties>
+
   <dependencies>
     <dependency>
       <groupId>com.google.guava</groupId>
@@ -47,6 +51,9 @@
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-surefire-plugin</artifactId>
           <configuration>
+            <parallel>all</parallel>
+            <threadCount>1</threadCount>
+            <perCoreThreadCount>true</perCoreThreadCount>
             <environmentVariables>
               <PLUGIN_VERSION>${project.version}</PLUGIN_VERSION>
             </environmentVariables>

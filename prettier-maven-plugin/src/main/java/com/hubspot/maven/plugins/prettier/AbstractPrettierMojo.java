@@ -78,12 +78,10 @@ public abstract class AbstractPrettierMojo extends PrettierArgs {
         }
 
         int status = process.waitFor();
-        if (status != 0) {
-          if (hasError) {
-            prettierExecutionFailed(status);
-          } else {
-            handlePrettierNonZeroExit(status);
-          }
+        if (hasError) {
+          prettierExecutionFailed(status);
+        } else if (status != 0) {
+          handlePrettierNonZeroExit(status);
         }
       }
     } catch (IOException | InterruptedException e) {
