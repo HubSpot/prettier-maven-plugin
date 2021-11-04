@@ -65,12 +65,13 @@ public abstract class AbstractPrettierMojo extends PrettierArgs {
           handlePrettierLogLine(line);
         }
 
-        boolean noMatchingFiles = false;
+        boolean hasError = false;
         while ((line = stderr.readLine()) != null) {
           if (line.contains("No matching files.") || line.contains("No files matching")) {
-            noMatchingFiles = true;
+            getLog().info(trimLogLevel(line));
           } else if (line.contains("error")) {
-            getLog().error(line);
+            getLog().error(trimLogLevel(line));
+            hasError = true;
           } else {
             handlePrettierLogLine(line);
           }
@@ -78,8 +79,8 @@ public abstract class AbstractPrettierMojo extends PrettierArgs {
 
         int status = process.waitFor();
         if (status != 0) {
-          if (status == 2 && noMatchingFiles) {
-            getLog().info("No files found matching input globs: " + globs);
+          if (hasError) {
+            prettierExecutionFailed(status);
           } else {
             handlePrettierNonZeroExit(status);
           }
@@ -88,6 +89,12 @@ public abstract class AbstractPrettierMojo extends PrettierArgs {
     } catch (IOException | InterruptedException e) {
       throw new MojoExecutionException("Error trying to run prettier-java", e);
     }
+  }
+
+  protected static MojoExecutionException prettierExecutionFailed(int status) throws MojoExecutionException {
+    throw new MojoExecutionException(
+        "Error trying to run prettier-java: " + status
+    );
   }
 
   protected List<String> basePrettierCommand() throws MojoExecutionException {
@@ -135,6 +142,21 @@ public abstract class AbstractPrettierMojo extends PrettierArgs {
     }
 
     return command;
+  }
+
+  protected static String trimLogLevel(String line) {
+    int closeBracketIndex = line.indexOf(']');
+    if (closeBracketIndex < 0) {
+      return line;
+    }
+
+    int startFileIndex = closeBracketIndex + "] ".length();
+    if (startFileIndex >= line.length()) {
+      return line;
+    }
+
+    // converts something like '[warn] src/main/java/Test.java' -> 'src/main/java/Test.java'
+    return line.substring(startFileIndex);
   }
 
   // Convert Windows Path to Unix style
