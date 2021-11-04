@@ -1,40 +1,23 @@
 package com.hubspot.maven.plugins.prettier;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.catchThrowable;
 
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.FileVisitResult;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.SimpleFileVisitor;
-import java.nio.file.StandardOpenOption;
-import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Arrays;
-import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
-import org.apache.maven.it.VerificationException;
-import org.apache.maven.it.Verifier;
 import org.junit.Test;
 
-import com.google.common.collect.ImmutableSet;
-import com.google.common.io.Resources;
 import com.hubspot.maven.plugins.prettier.TestConfiguration.Goal;
 
-public class CheckMojoTest extends AbstractPrettierMojoTest {
+public class WriteMojoTest extends AbstractPrettierMojoTest {
 
   @Test
-  public void itChecksGoodJava() throws Exception {
+  public void itWritesGoodJava() throws Exception {
     for (String prettierJavaVersion : getPrettierJavaVersionsToTest()) {
       TestConfiguration testConfiguration = TestConfiguration
           .newBuilder()
           .setPrettierJavaVersion(prettierJavaVersion)
           .setInputGlobs(Arrays.asList(JAVA_GOOD_FORMATTING))
-          .setGoal(Goal.CHECK)
+          .setGoal(Goal.WRITE)
           .build();
 
       MavenResult result = runMaven(testConfiguration);
@@ -46,13 +29,13 @@ public class CheckMojoTest extends AbstractPrettierMojoTest {
   }
 
   @Test
-  public void itChecksGoodJs() throws Exception {
+  public void itWritesGoodJs() throws Exception {
     for (String prettierJavaVersion : getPrettierJavaVersionsToTest()) {
       TestConfiguration testConfiguration = TestConfiguration
           .newBuilder()
           .setPrettierJavaVersion(prettierJavaVersion)
           .setInputGlobs(Arrays.asList(JS_GOOD_FORMATTING))
-          .setGoal(Goal.CHECK)
+          .setGoal(Goal.WRITE)
           .build();
 
       MavenResult result = runMaven(testConfiguration);
@@ -64,13 +47,13 @@ public class CheckMojoTest extends AbstractPrettierMojoTest {
   }
 
   @Test
-  public void itChecksGoodJavaAndGoodJs() throws Exception {
+  public void itWritesGoodJavaAndGoodJs() throws Exception {
     for (String prettierJavaVersion : getPrettierJavaVersionsToTest()) {
       TestConfiguration testConfiguration = TestConfiguration
           .newBuilder()
           .setPrettierJavaVersion(prettierJavaVersion)
           .setInputGlobs(Arrays.asList(JAVA_GOOD_FORMATTING, JS_GOOD_FORMATTING))
-          .setGoal(Goal.CHECK)
+          .setGoal(Goal.WRITE)
           .build();
 
       MavenResult result = runMaven(testConfiguration);
@@ -83,68 +66,68 @@ public class CheckMojoTest extends AbstractPrettierMojoTest {
   }
 
   @Test
-  public void itChecksBadJava() throws Exception {
+  public void itWritesBadJava() throws Exception {
     for (String prettierJavaVersion : getPrettierJavaVersionsToTest()) {
       TestConfiguration testConfiguration = TestConfiguration
           .newBuilder()
           .setPrettierJavaVersion(prettierJavaVersion)
           .setInputGlobs(Arrays.asList(JAVA_BAD_FORMATTING))
-          .setGoal(Goal.CHECK)
+          .setGoal(Goal.WRITE)
           .build();
 
       MavenResult result = runMaven(testConfiguration);
 
-      assertThat(result.getSuccess()).isFalse();
-      assertThat(result.getOutput()).contains(BUILD_FAILURE);
-      assertThat(result.getOutput()).contains(incorrectlyFormattedFile(JAVA_BAD_FORMATTING));
+      assertThat(result.getSuccess()).isTrue();
+      assertThat(result.getOutput()).contains(BUILD_SUCCESS);
+      assertThat(result.getOutput()).contains(reformattedFile(JAVA_BAD_FORMATTING));
     }
   }
 
   @Test
-  public void itChecksBadJs() throws Exception {
+  public void itWritesBadJs() throws Exception {
     for (String prettierJavaVersion : getPrettierJavaVersionsToTest()) {
       TestConfiguration testConfiguration = TestConfiguration
           .newBuilder()
           .setPrettierJavaVersion(prettierJavaVersion)
           .setInputGlobs(Arrays.asList(JS_BAD_FORMATTING))
-          .setGoal(Goal.CHECK)
+          .setGoal(Goal.WRITE)
           .build();
 
       MavenResult result = runMaven(testConfiguration);
 
-      assertThat(result.getSuccess()).isFalse();
-      assertThat(result.getOutput()).contains(BUILD_FAILURE);
-      assertThat(result.getOutput()).contains(incorrectlyFormattedFile(JS_BAD_FORMATTING));
+      assertThat(result.getSuccess()).isTrue();
+      assertThat(result.getOutput()).contains(BUILD_SUCCESS);
+      assertThat(result.getOutput()).contains(reformattedFile(JS_BAD_FORMATTING));
     }
   }
 
   @Test
-  public void itChecksBadJavaAndBadJs() throws Exception {
+  public void itWritesBadJavaAndBadJs() throws Exception {
     for (String prettierJavaVersion : getPrettierJavaVersionsToTest()) {
       TestConfiguration testConfiguration = TestConfiguration
           .newBuilder()
           .setPrettierJavaVersion(prettierJavaVersion)
           .setInputGlobs(Arrays.asList(JAVA_BAD_FORMATTING, JS_BAD_FORMATTING))
-          .setGoal(Goal.CHECK)
+          .setGoal(Goal.WRITE)
           .build();
 
       MavenResult result = runMaven(testConfiguration);
 
-      assertThat(result.getSuccess()).isFalse();
-      assertThat(result.getOutput()).contains(BUILD_FAILURE);
-      assertThat(result.getOutput()).contains(incorrectlyFormattedFile(JAVA_BAD_FORMATTING));
-      assertThat(result.getOutput()).contains(incorrectlyFormattedFile(JS_BAD_FORMATTING));
+      assertThat(result.getSuccess()).isTrue();
+      assertThat(result.getOutput()).contains(BUILD_SUCCESS);
+      assertThat(result.getOutput()).contains(reformattedFile(JAVA_BAD_FORMATTING));
+      assertThat(result.getOutput()).contains(reformattedFile(JS_BAD_FORMATTING));
     }
   }
 
   @Test
-  public void itChecksInvalidJava() throws Exception {
+  public void itWritesInvalidJava() throws Exception {
     for (String prettierJavaVersion : getPrettierJavaVersionsToTest()) {
       TestConfiguration testConfiguration = TestConfiguration
           .newBuilder()
           .setPrettierJavaVersion(prettierJavaVersion)
           .setInputGlobs(Arrays.asList(JAVA_INVALID_SYNTAX))
-          .setGoal(Goal.CHECK)
+          .setGoal(Goal.WRITE)
           .build();
 
       MavenResult result = runMaven(testConfiguration);
@@ -156,13 +139,13 @@ public class CheckMojoTest extends AbstractPrettierMojoTest {
   }
 
   @Test
-  public void itChecksInvalidJs() throws Exception {
+  public void itWritesInvalidJs() throws Exception {
     for (String prettierJavaVersion : getPrettierJavaVersionsToTest()) {
       TestConfiguration testConfiguration = TestConfiguration
           .newBuilder()
           .setPrettierJavaVersion(prettierJavaVersion)
           .setInputGlobs(Arrays.asList(JS_INVALID_SYNTAX))
-          .setGoal(Goal.CHECK)
+          .setGoal(Goal.WRITE)
           .build();
 
       MavenResult result = runMaven(testConfiguration);
@@ -174,13 +157,13 @@ public class CheckMojoTest extends AbstractPrettierMojoTest {
   }
 
   @Test
-  public void itChecksInvalidJavaAndInvalidJs() throws Exception {
+  public void itWritesInvalidJavaAndInvalidJs() throws Exception {
     for (String prettierJavaVersion : getPrettierJavaVersionsToTest()) {
       TestConfiguration testConfiguration = TestConfiguration
           .newBuilder()
           .setPrettierJavaVersion(prettierJavaVersion)
           .setInputGlobs(Arrays.asList(JAVA_INVALID_SYNTAX, JS_INVALID_SYNTAX))
-          .setGoal(Goal.CHECK)
+          .setGoal(Goal.WRITE)
           .build();
 
       MavenResult result = runMaven(testConfiguration);
@@ -193,13 +176,13 @@ public class CheckMojoTest extends AbstractPrettierMojoTest {
   }
 
   @Test
-  public void itChecksUnknownExtensions() throws Exception {
+  public void itWritesUnknownExtensions() throws Exception {
     for (String prettierJavaVersion : getPrettierJavaVersionsToTest()) {
       TestConfiguration testConfiguration = TestConfiguration
           .newBuilder()
           .setPrettierJavaVersion(prettierJavaVersion)
           .setInputGlobs(Arrays.asList(UNKNOWN_EXTENSION))
-          .setGoal(Goal.CHECK)
+          .setGoal(Goal.WRITE)
           .build();
 
       MavenResult result = runMaven(testConfiguration);
@@ -211,13 +194,13 @@ public class CheckMojoTest extends AbstractPrettierMojoTest {
   }
 
   @Test
-  public void itChecksEmpty() throws Exception {
+  public void itWritesEmpty() throws Exception {
     for (String prettierJavaVersion : getPrettierJavaVersionsToTest()) {
       TestConfiguration testConfiguration = TestConfiguration
           .newBuilder()
           .setPrettierJavaVersion(prettierJavaVersion)
           .setInputGlobs(Arrays.asList(EMPTY))
-          .setGoal(Goal.CHECK)
+          .setGoal(Goal.WRITE)
           .build();
 
       MavenResult result = runMaven(testConfiguration);
@@ -231,31 +214,31 @@ public class CheckMojoTest extends AbstractPrettierMojoTest {
   }
 
   @Test
-  public void itChecksGoodJavaAndBadJs() throws Exception {
+  public void itWritesGoodJavaAndBadJs() throws Exception {
     for (String prettierJavaVersion : getPrettierJavaVersionsToTest()) {
       TestConfiguration testConfiguration = TestConfiguration
           .newBuilder()
           .setPrettierJavaVersion(prettierJavaVersion)
           .setInputGlobs(Arrays.asList(JAVA_GOOD_FORMATTING, JS_BAD_FORMATTING))
-          .setGoal(Goal.CHECK)
+          .setGoal(Goal.WRITE)
           .build();
 
       MavenResult result = runMaven(testConfiguration);
 
-      assertThat(result.getSuccess()).isFalse();
-      assertThat(result.getOutput()).contains(BUILD_FAILURE);
-      assertThat(result.getOutput()).contains(incorrectlyFormattedFile(JS_BAD_FORMATTING));
+      assertThat(result.getSuccess()).isTrue();
+      assertThat(result.getOutput()).contains(BUILD_SUCCESS);
+      assertThat(result.getOutput()).contains(reformattedFile(JS_BAD_FORMATTING));
     }
   }
 
   @Test
-  public void itChecksGoodJavaAndGoodJsAndEmpty() throws Exception {
+  public void itWritesGoodJavaAndGoodJsAndEmpty() throws Exception {
     for (String prettierJavaVersion : getPrettierJavaVersionsToTest()) {
       TestConfiguration testConfiguration = TestConfiguration
           .newBuilder()
           .setPrettierJavaVersion(prettierJavaVersion)
           .setInputGlobs(Arrays.asList(JAVA_GOOD_FORMATTING, JS_GOOD_FORMATTING, EMPTY))
-          .setGoal(Goal.CHECK)
+          .setGoal(Goal.WRITE)
           .build();
 
       MavenResult result = runMaven(testConfiguration);
@@ -271,21 +254,21 @@ public class CheckMojoTest extends AbstractPrettierMojoTest {
   }
 
   @Test
-  public void itChecksBadJavaAndBadJsAndEmpty() throws Exception {
+  public void itWritesBadJavaAndBadJsAndEmpty() throws Exception {
     for (String prettierJavaVersion : getPrettierJavaVersionsToTest()) {
       TestConfiguration testConfiguration = TestConfiguration
           .newBuilder()
           .setPrettierJavaVersion(prettierJavaVersion)
           .setInputGlobs(Arrays.asList(JAVA_BAD_FORMATTING, JS_BAD_FORMATTING, EMPTY))
-          .setGoal(Goal.CHECK)
+          .setGoal(Goal.WRITE)
           .build();
 
       MavenResult result = runMaven(testConfiguration);
 
-      assertThat(result.getSuccess()).isFalse();
-      assertThat(result.getOutput()).contains(BUILD_FAILURE);
-      assertThat(result.getOutput()).contains(incorrectlyFormattedFile(JAVA_BAD_FORMATTING));
-      assertThat(result.getOutput()).contains(incorrectlyFormattedFile(JS_BAD_FORMATTING));
+      assertThat(result.getSuccess()).isTrue();
+      assertThat(result.getOutput()).contains(BUILD_SUCCESS);
+      assertThat(result.getOutput()).contains(reformattedFile(JAVA_BAD_FORMATTING));
+      assertThat(result.getOutput()).contains(reformattedFile(JS_BAD_FORMATTING));
       if (isNewishVersion(prettierJavaVersion)) {
         assertThat(result.getOutput()).contains(noMatchingFiles(EMPTY));
       }
