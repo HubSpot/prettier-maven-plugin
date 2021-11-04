@@ -2,6 +2,7 @@ package com.hubspot.maven.plugins.prettier;
 
 import com.hubspot.maven.plugins.prettier.diff.DiffGenerator;
 import com.hubspot.maven.plugins.prettier.diff.GenerateDiffArgs;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
@@ -37,15 +38,11 @@ public class CheckMojo extends AbstractPrettierMojo {
 
   @Override
   protected void handlePrettierLogLine(String line) {
-    if (line.endsWith(".java")) {
-      line = trimLogLevel(line);
+    line = trimLogLevel(line);
 
-      Path baseDir = project
-          .getBasedir()
-          .toPath()
-          .toAbsolutePath();
-
-      incorrectlyFormattedFiles.add(baseDir.resolve(line));
+    Path maybeFile = resolveFile(line);
+    if (Files.isRegularFile(maybeFile)) {
+      incorrectlyFormattedFiles.add(maybeFile);
       String message = "Incorrectly formatted file: " + line;
       if (fail) {
         getLog().error(message);
@@ -98,12 +95,27 @@ public class CheckMojo extends AbstractPrettierMojo {
     }
   }
 
+  private Path resolveFile(String relativePath) {
+    Path baseDir = project
+        .getBasedir()
+        .toPath()
+        .toAbsolutePath();
+
+    return baseDir.resolve(relativePath);
+  }
+
   private static String trimLogLevel(String line) {
-    if (line.contains("]")) {
-      // converts something like '[warn] src/main/java/Test.java' -> 'src/main/java/Test.java'
-      return line.substring(line.indexOf(']') + 2);
-    } else {
+    int closeBracketIndex = line.indexOf(']');
+    if (closeBracketIndex < 0) {
       return line;
     }
+
+    int startFileIndex = closeBracketIndex + "] ".length();
+    if (startFileIndex >= line.length()) {
+      return line;
+    }
+
+    // converts something like '[warn] src/main/java/Test.java' -> 'src/main/java/Test.java'
+    return line.substring(startFileIndex);
   }
 }
