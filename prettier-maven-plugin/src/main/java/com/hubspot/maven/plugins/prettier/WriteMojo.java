@@ -2,7 +2,7 @@ package com.hubspot.maven.plugins.prettier;
 
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
-import org.apache.maven.plugin.MojoExecutionException;
+
 import org.apache.maven.plugins.annotations.Mojo;
 
 @Mojo(name = "write", threadSafe = true)
