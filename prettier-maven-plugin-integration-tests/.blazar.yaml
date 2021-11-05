@@ -1,0 +1,2 @@
+env:
+  PRETTIER_NODE_VERSION: 10.17.0

@@ -13,6 +13,7 @@
         <artifactId>prettier-maven-plugin</artifactId>
         <version>${pluginVersion}</version>
         <configuration>
+          <nodeVersion>${nodeVersion}</nodeVersion>
           <prettierJavaVersion>${prettierJavaVersion}</prettierJavaVersion>
           <ignoreConfigFile>true</ignoreConfigFile>
           <ignoreEditorConfig>true</ignoreEditorConfig>

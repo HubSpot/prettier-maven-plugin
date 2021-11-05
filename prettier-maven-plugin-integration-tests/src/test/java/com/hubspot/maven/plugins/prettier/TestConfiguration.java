@@ -3,6 +3,7 @@ package com.hubspot.maven.plugins.prettier;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.google.common.base.MoreObjects;
 import com.google.common.base.Preconditions;
 
 public class TestConfiguration {
@@ -26,6 +27,10 @@ public class TestConfiguration {
 
   public String render(String template) {
     return template
+        .replace(
+            "${nodeVersion}",
+            MoreObjects.firstNonNull(System.getenv("PRETTIER_NODE_VERSION"), "12.13.0")
+        )
         .replace("${pluginVersion}", System.getenv("PLUGIN_VERSION"))
         .replace("${prettierJavaVersion}", prettierJavaVersion)
         .replace(
