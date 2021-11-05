@@ -19,7 +19,7 @@ This example will run the `check` goal inside of Travis CI, and the `write` goal
     <plugin>
       <groupId>com.hubspot.maven.plugins</groupId>
       <artifactId>prettier-maven-plugin</artifactId>
-      <version>0.14</version>
+      <version>0.16</version>
       <configuration>
         <prettierJavaVersion>1.3.0</prettierJavaVersion>
         <printWidth>90</printWidth>
@@ -81,9 +81,9 @@ If you want to customize the behavior of prettier, you can use a normal prettier
 | skip | N/A | false | If set to true, plugin execution will be skipped |
 | fail | N/A | true | **Only appplies to `check` goal**. If set to true, the plugin execution will fail if any unformatted files are found |
 | generateDiff | N/A | false | **Only appplies to `check` goal. Be sure to have to sh and diff in your PATH**. If set to true, a diff will be generated between the current code and the prettier-formatted code. |
-| diffGenerator | prettier.diffGenerator | _ | **Only appplies to `check` goal**. Can be used to supply a custom implementation of [`DiffGenerator`](https://github.com/HubSpot/prettier-maven-plugin/blob/master/src/main/java/com/hubspot/maven/plugins/prettier/diff/DiffGenerator.java)
-| nodeVersion | prettier.nodeVersion | 12.13.0 | Controls version of Node used to run prettier-java. Valid values can be found [here](https://github.com/HubSpot/prettier-maven-plugin/tree/master/src/main/binaries/node) |
-| prettierJavaVersion | prettier.prettierJavaVersion | 0.7.0 | Controls version of prettier-java that is used. Valid values can be found [here](https://github.com/HubSpot/prettier-maven-plugin/tree/master/src/main/binaries/prettier-java) |
+| diffGenerator | prettier.diffGenerator | _ | **Only appplies to `check` goal**. Can be used to supply a custom implementation of [`DiffGenerator`](https://github.com/HubSpot/prettier-maven-plugin/blob/master/prettier-maven-plugin/src/main/java/com/hubspot/maven/plugins/prettier/diff/DiffGenerator.java)
+| nodeVersion | prettier.nodeVersion | 12.13.0 | Controls version of Node used to run prettier-java. Valid values can be found [here](https://github.com/HubSpot/prettier-maven-plugin/tree/master/prettier-maven-plugin/src/main/binaries/node) |
+| prettierJavaVersion | prettier.prettierJavaVersion | 0.7.0 | Controls version of prettier-java that is used. Valid values can be found [here](https://github.com/HubSpot/prettier-maven-plugin/tree/master/prettier-maven-plugin/src/main/binaries/prettier-java) |
 | printWidth | prettier.printWidth | `null` | If set, will be passed to prettier as `--print-width`. More information [here](https://prettier.io/docs/en/options.html#print-width) |
 | tabWidth | prettier.tabWidth | `null` | If set, will be passed to prettier as `--tab-width`. More information [here](https://prettier.io/docs/en/options.html#tab-width) |
 | useTabs | prettier.useTabs | `null` | If set, will be passed to prettier as `--use-tabs`. More information [here](https://prettier.io/docs/en/options.html#tabs) |
@@ -101,7 +101,7 @@ For convenience, this plugin bundles Node, prettier, and prettier-java. Over tim
 You can download binaries for Linux/OSX/Windows from here:
 https://nodejs.org/en/about/releases/
 
-1. Make a new folder located at `src/main/binaries/node/{node-version}` and drop the binaries in there using the existing name formatting.
+1. Make a new folder located at `prettier-maven-plugin/src/main/binaries/node/{node-version}` and drop the binaries in there using the existing name formatting.
 2. Update the pom.xml to attach these new binaries
 
 #### Adding new versions of prettier-java
