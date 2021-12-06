@@ -51,6 +51,9 @@ public abstract class PrettierArgs extends AbstractMojo {
   @Parameter(defaultValue = "12.13.0", property = "prettier.nodeVersion")
   private String nodeVersion;
 
+  @Parameter(defaultValue = "", property = "prettier.nodePath")
+  private String nodePath;
+
   @Parameter(defaultValue = "0.7.0", property = "prettier.prettierJavaVersion")
   private String prettierJavaVersion;
 
@@ -108,7 +111,12 @@ public abstract class PrettierArgs extends AbstractMojo {
       getLog().debug("Resolving node artifact " + nodeArtifact);
     }
 
-    File nodeExecutable = resolve(nodeArtifact).getFile();
+    File nodeExecutable = null;
+    if(nodePath != null && !nodePath.equals("")) {
+      nodeExecutable = new File(nodePath);
+    } else {
+      nodeExecutable = resolve(nodeArtifact).getFile();
+    }
     if (!nodeExecutable.setExecutable(true, false)) {
       throw new MojoExecutionException(
           "Unable to make file executable " + nodeExecutable
