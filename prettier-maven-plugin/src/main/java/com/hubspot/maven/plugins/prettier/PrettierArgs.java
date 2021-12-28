@@ -99,6 +99,10 @@ public abstract class PrettierArgs extends AbstractMojo {
   private RepositorySystem repositorySystem;
 
   protected Path resolveNodeExecutable() throws MojoExecutionException {
+    if (nodePath != null && !nodePath.isEmpty()) {
+      getLog().info("Using customized nodePath: " + nodePath);
+      return Paths.get(nodePath);
+    }
     Artifact nodeArtifact = new DefaultArtifact(
         pluginDescriptor.getGroupId(),
         pluginDescriptor.getArtifactId(),
@@ -111,12 +115,7 @@ public abstract class PrettierArgs extends AbstractMojo {
       getLog().debug("Resolving node artifact " + nodeArtifact);
     }
 
-    File nodeExecutable = null;
-    if(nodePath != null && !nodePath.equals("")) {
-      nodeExecutable = new File(nodePath);
-    } else {
-      nodeExecutable = resolve(nodeArtifact).getFile();
-    }
+    File nodeExecutable = resolve(nodeArtifact).getFile();
     if (!nodeExecutable.setExecutable(true, false)) {
       throw new MojoExecutionException(
           "Unable to make file executable " + nodeExecutable
