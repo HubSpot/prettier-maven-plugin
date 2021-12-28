@@ -51,6 +51,9 @@ public abstract class PrettierArgs extends AbstractMojo {
   @Parameter(defaultValue = "12.13.0", property = "prettier.nodeVersion")
   private String nodeVersion;
 
+  @Parameter(defaultValue = "", property = "prettier.nodePath")
+  private String nodePath;
+
   @Parameter(defaultValue = "0.7.0", property = "prettier.prettierJavaVersion")
   private String prettierJavaVersion;
 
@@ -96,6 +99,10 @@ public abstract class PrettierArgs extends AbstractMojo {
   private RepositorySystem repositorySystem;
 
   protected Path resolveNodeExecutable() throws MojoExecutionException {
+    if (nodePath != null && !nodePath.isEmpty()) {
+      getLog().info("Using customized nodePath: " + nodePath);
+      return Paths.get(nodePath);
+    }
     Artifact nodeArtifact = new DefaultArtifact(
         pluginDescriptor.getGroupId(),
         pluginDescriptor.getArtifactId(),
