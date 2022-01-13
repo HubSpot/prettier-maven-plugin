@@ -35,10 +35,6 @@ import org.eclipse.aether.resolution.ArtifactResolutionException;
 import org.eclipse.aether.resolution.ArtifactResult;
 
 public abstract class PrettierArgs extends AbstractMojo {
-  private static final Set<PosixFilePermission> GLOBAL_PERMISSIONS = PosixFilePermissions.fromString(
-      "rwxrwxrwx"
-  );
-
   /**
    * Prevent multi-threaded builds from reading/writing partial files
    */
@@ -48,11 +44,14 @@ public abstract class PrettierArgs extends AbstractMojo {
   @Parameter(defaultValue = "${project}", readonly = true, required = false)
   protected MavenProject project;
 
-  @Parameter(defaultValue = "12.13.0", property = "prettier.nodeVersion")
+  @Parameter(defaultValue = "16.13.1", property = "prettier.nodeVersion")
   private String nodeVersion;
 
   @Parameter(defaultValue = "", property = "prettier.nodePath")
   private String nodePath;
+
+  @Parameter(defaultValue = "", property = "prettier.npmPath")
+  private String npmPath;
 
   @Parameter(defaultValue = "0.7.0", property = "prettier.prettierJavaVersion")
   private String prettierJavaVersion;
@@ -253,54 +252,6 @@ public abstract class PrettierArgs extends AbstractMojo {
 
   private String determinePrettierJavaClassifier() {
     return "prettier-java-" + prettierJavaVersion;
-  }
-
-  private enum OperatingSystemFamily {
-    LINUX("linux"), MAC_OS_X("mac_os_x"), WINDOWS("windows");
-
-    private String shortName;
-
-    OperatingSystemFamily(String shortName) {
-      this.shortName = shortName;
-    }
-
-    public String getShortName() {
-      return shortName;
-    }
-
-    public FileAttribute<?>[] getGlobalPermissions() {
-      if (this == WINDOWS) {
-        return new FileAttribute<?>[0];
-      } else {
-        return new FileAttribute<?>[] {
-            PosixFilePermissions.asFileAttribute(GLOBAL_PERMISSIONS)
-        };
-      }
-    }
-  }
-
-  private String determineNodeClassifier() throws MojoExecutionException {
-    OperatingSystemFamily osFamily = determineOperatingSystemFamily();
-    return "node-" + nodeVersion + "-" + osFamily.getShortName();
-  }
-
-  private OperatingSystemFamily determineOperatingSystemFamily() throws MojoExecutionException {
-    String osFullName = System.getProperty("os.name");
-    if (osFullName == null) {
-      throw new MojoExecutionException("No os.name system property set");
-    } else {
-      osFullName = osFullName.toLowerCase();
-    }
-
-    if (osFullName.startsWith("linux")) {
-      return OperatingSystemFamily.LINUX;
-    } else if (osFullName.startsWith("mac os x")) {
-      return OperatingSystemFamily.MAC_OS_X;
-    } else if (osFullName.startsWith("windows")) {
-      return OperatingSystemFamily.WINDOWS;
-    } else {
-      throw new MojoExecutionException("Unknown os.name " + osFullName);
-    }
   }
 
   private static boolean isIgnorableMoveError(IOException e) {
