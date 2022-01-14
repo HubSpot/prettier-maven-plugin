@@ -14,12 +14,16 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.io.CharStreams;
 import com.google.common.io.Resources;
 
 public abstract class AbstractPrettierMojoTest {
+  private static final Logger LOG = Logger.getLogger(AbstractPrettierMojoTest.class.getName());
+
   protected static final String JAVA_GOOD_FORMATTING = "java-good-formatting/*.java";
   protected static final String JAVA_BAD_FORMATTING = "java-bad-formatting/*.java";
   protected static final String JAVA_INVALID_SYNTAX = "java-invalid-syntax/*.java";
@@ -38,6 +42,16 @@ public abstract class AbstractPrettierMojoTest {
 
   protected static MavenResult runMaven(TestConfiguration testConfiguration) throws IOException {
     Path temp = setupTestDirectory(testConfiguration);
+
+    LOG.log(
+        Level.INFO,
+        "Testing prettier-java={0}, goal={1}, input={2}",
+        new Object[] {
+          testConfiguration.getPrettierJavaVersion(),
+          testConfiguration.getGoal(),
+          testConfiguration.getInputGlobs()
+        }
+    );
 
     List<String> command = Arrays.asList(
         "mvn",
