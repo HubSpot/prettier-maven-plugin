@@ -32,7 +32,7 @@ public abstract class AbstractPrettierMojoTest {
   protected static final String EMPTY = "empty/*.java";
   protected static final String BUILD_SUCCESS = "BUILD SUCCESS";
   protected static final String BUILD_FAILURE = "BUILD FAILURE";
-  private static final Set<String> PRETTIER_JAVA_VERSIONS_TO_TEST = findPrettierJavaVersionsToTest();
+  private static final Set<String> PRETTIER_JAVA_VERSIONS_TO_TEST = ImmutableSet.of("1.4.0", "1.5.0", "1.6.1");
 
   protected static Set<String> getPrettierJavaVersionsToTest() {
     return PRETTIER_JAVA_VERSIONS_TO_TEST;
@@ -117,41 +117,5 @@ public abstract class AbstractPrettierMojoTest {
     Files.write(temp.resolve("pom.xml"), rendered.getBytes(StandardCharsets.UTF_8), StandardOpenOption.CREATE_NEW);
 
     return temp;
-  }
-
-  private static Set<String> findPrettierJavaVersionsToTest() {
-    Path baseDirectory = Paths.get("../prettier-maven-plugin/src/main/binaries/prettier-java");
-
-    // keep the build time down by not testing every older version
-    Set<String> ignoredPrettierJavaVersions = ImmutableSet.of(
-        "0.6.0",
-        "0.7.1",
-        "0.8.0",
-        "0.8.2",
-        "0.8.3",
-        "1.0.1",
-        "1.1.0",
-        "c08da7b2b0486f59980a01cb99c6f0756725450a",
-        "6cf5cfdf76550ab4418a6e900696ba35eaa0fbc8",
-        "a24aa13714b850ab3d0f4e3f07414137c33321a1"
-    );
-
-    try (Stream<Path> files = Files.walk(baseDirectory)) {
-      return files
-          .filter(Files::isRegularFile)
-          .map(Path::getFileName)
-          .map(Path::toString)
-          .map(
-              prettierJavaZip ->
-                  prettierJavaZip.substring(
-                      "prettier-java-".length(),
-                      prettierJavaZip.length() - ".zip".length()
-                  )
-          )
-          .filter(prettierJavaVersion -> !ignoredPrettierJavaVersions.contains(prettierJavaVersion))
-          .collect(Collectors.toSet());
-    } catch (IOException e) {
-      throw new RuntimeException(e);
-    }
   }
 }

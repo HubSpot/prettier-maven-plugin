@@ -29,7 +29,7 @@ public class TestConfiguration {
     return template
         .replace(
             "${nodeVersion}",
-            MoreObjects.firstNonNull(System.getenv("PRETTIER_NODE_VERSION"), "12.13.0")
+            MoreObjects.firstNonNull(System.getenv("PRETTIER_NODE_VERSION"), "16.13.2")
         )
         .replace("${pluginVersion}", System.getenv("PLUGIN_VERSION"))
         .replace("${prettierJavaVersion}", prettierJavaVersion)
