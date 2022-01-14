@@ -39,7 +39,6 @@ public abstract class AbstractPrettierMojoTest {
   protected static MavenResult runMaven(TestConfiguration testConfiguration) throws IOException {
     Path temp = setupTestDirectory(testConfiguration);
 
-    System.out.println(System.getenv("MAVEN_OPTS"));
     List<String> command = Arrays.asList(
         "mvn",
         "-e",
