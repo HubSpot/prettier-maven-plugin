@@ -5,7 +5,7 @@
   <parent>
     <groupId>com.hubspot.maven.plugins</groupId>
     <artifactId>prettier-maven-plugin-parent</artifactId>
-    <version>0.17-SNAPSHOT</version>
+    <version>0.17</version>
   </parent>
 
   <artifactId>prettier-maven-plugin-integration-tests</artifactId>
