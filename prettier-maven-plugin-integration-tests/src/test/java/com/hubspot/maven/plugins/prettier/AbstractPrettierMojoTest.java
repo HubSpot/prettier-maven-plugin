@@ -1,8 +1,8 @@
 package com.hubspot.maven.plugins.prettier;
 
-import static org.assertj.core.api.Assertions.catchThrowable;
-
+import java.io.BufferedInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
@@ -11,17 +11,19 @@ import java.nio.file.Paths;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.StandardOpenOption;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import org.apache.maven.it.VerificationException;
-import org.apache.maven.it.Verifier;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import com.google.common.collect.ImmutableSet;
+import com.google.common.io.CharStreams;
 import com.google.common.io.Resources;
 
 public abstract class AbstractPrettierMojoTest {
+  private static final Logger LOG = Logger.getLogger(AbstractPrettierMojoTest.class.getName());
+
   protected static final String JAVA_GOOD_FORMATTING = "java-good-formatting/*.java";
   protected static final String JAVA_BAD_FORMATTING = "java-bad-formatting/*.java";
   protected static final String JAVA_INVALID_SYNTAX = "java-invalid-syntax/*.java";
@@ -32,29 +34,47 @@ public abstract class AbstractPrettierMojoTest {
   protected static final String EMPTY = "empty/*.java";
   protected static final String BUILD_SUCCESS = "BUILD SUCCESS";
   protected static final String BUILD_FAILURE = "BUILD FAILURE";
-  private static final Set<String> PRETTIER_JAVA_VERSIONS_TO_TEST = findPrettierJavaVersionsToTest();
+  private static final Set<String> PRETTIER_JAVA_VERSIONS_TO_TEST = ImmutableSet.of("1.5.0", "1.6.1");
 
   protected static Set<String> getPrettierJavaVersionsToTest() {
     return PRETTIER_JAVA_VERSIONS_TO_TEST;
   }
 
-  protected static MavenResult runMaven(TestConfiguration testConfiguration)
-      throws IOException, VerificationException {
+  protected static MavenResult runMaven(TestConfiguration testConfiguration) throws IOException {
     Path temp = setupTestDirectory(testConfiguration);
 
-    Verifier verifier = new Verifier(temp.toAbsolutePath().toString());
-    verifier.setAutoclean(false);
-    Throwable t = catchThrowable(() -> verifier.executeGoal("validate"));
-    verifier.resetStreams();
-
-    return new MavenResult(
-        t == null,
-        verifier
-            .loadFile(verifier.getBasedir(), verifier.getLogFileName(), false)
-            .stream()
-            .map(Verifier::stripAnsi)
-            .collect(Collectors.joining("\n"))
+    LOG.log(
+        Level.INFO,
+        "Testing prettier-java={0}, goal={1}, input={2}",
+        new Object[] {
+          testConfiguration.getPrettierJavaVersion(),
+          testConfiguration.getGoal(),
+          testConfiguration.getInputGlobs()
+        }
     );
+
+    List<String> command = Arrays.asList(
+        "mvn",
+        "-e",
+        "--batch-mode",
+        "-Dstyle.color=never",
+        "-Daether.artifactResolver.snapshotNormalization=false",
+        "-Daether.connector.resumeDownloads=false",
+        "validate"
+    );
+
+    Process process = new ProcessBuilder(command.toArray(new String[0]))
+        .directory(temp.toFile())
+        .redirectErrorStream(true)
+        .start();
+
+    try (InputStreamReader reader = new InputStreamReader(new BufferedInputStream(process.getInputStream()), StandardCharsets.UTF_8)) {
+      String output = CharStreams.toString(reader);
+      boolean success = process.waitFor() == 0;
+      return new MavenResult(success, output);
+    } catch (InterruptedException e) {
+      throw new RuntimeException("Interrupted while running maven", e);
+    }
   }
 
   protected static boolean isNewishVersion(String prettierJavaVersion) {
@@ -117,41 +137,5 @@ public abstract class AbstractPrettierMojoTest {
     Files.write(temp.resolve("pom.xml"), rendered.getBytes(StandardCharsets.UTF_8), StandardOpenOption.CREATE_NEW);
 
     return temp;
-  }
-
-  private static Set<String> findPrettierJavaVersionsToTest() {
-    Path baseDirectory = Paths.get("../prettier-maven-plugin/src/main/binaries/prettier-java");
-
-    // keep the build time down by not testing every older version
-    Set<String> ignoredPrettierJavaVersions = ImmutableSet.of(
-        "0.6.0",
-        "0.7.1",
-        "0.8.0",
-        "0.8.2",
-        "0.8.3",
-        "1.0.1",
-        "1.1.0",
-        "c08da7b2b0486f59980a01cb99c6f0756725450a",
-        "6cf5cfdf76550ab4418a6e900696ba35eaa0fbc8",
-        "a24aa13714b850ab3d0f4e3f07414137c33321a1"
-    );
-
-    try (Stream<Path> files = Files.walk(baseDirectory)) {
-      return files
-          .filter(Files::isRegularFile)
-          .map(Path::getFileName)
-          .map(Path::toString)
-          .map(
-              prettierJavaZip ->
-                  prettierJavaZip.substring(
-                      "prettier-java-".length(),
-                      prettierJavaZip.length() - ".zip".length()
-                  )
-          )
-          .filter(prettierJavaVersion -> !ignoredPrettierJavaVersions.contains(prettierJavaVersion))
-          .collect(Collectors.toSet());
-    } catch (IOException e) {
-      throw new RuntimeException(e);
-    }
   }
 }

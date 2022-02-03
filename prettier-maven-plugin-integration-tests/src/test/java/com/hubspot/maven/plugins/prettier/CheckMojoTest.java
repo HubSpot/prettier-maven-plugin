@@ -1,28 +1,11 @@
 package com.hubspot.maven.plugins.prettier;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.catchThrowable;
 
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.FileVisitResult;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.SimpleFileVisitor;
-import java.nio.file.StandardOpenOption;
-import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Arrays;
-import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
-import org.apache.maven.it.VerificationException;
-import org.apache.maven.it.Verifier;
 import org.junit.Test;
 
-import com.google.common.collect.ImmutableSet;
-import com.google.common.io.Resources;
 import com.hubspot.maven.plugins.prettier.TestConfiguration.Goal;
 
 public class CheckMojoTest extends AbstractPrettierMojoTest {

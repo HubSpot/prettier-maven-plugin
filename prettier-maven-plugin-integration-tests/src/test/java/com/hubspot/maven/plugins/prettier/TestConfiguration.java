@@ -25,11 +25,23 @@ public class TestConfiguration {
     return new Builder();
   }
 
+  public String getPrettierJavaVersion() {
+    return prettierJavaVersion;
+  }
+
+  public List<String> getInputGlobs() {
+    return inputGlobs;
+  }
+
+  public Goal getGoal() {
+    return goal;
+  }
+
   public String render(String template) {
     return template
         .replace(
             "${nodeVersion}",
-            MoreObjects.firstNonNull(System.getenv("PRETTIER_NODE_VERSION"), "12.13.0")
+            MoreObjects.firstNonNull(System.getenv("PRETTIER_NODE_VERSION"), "16.13.2")
         )
         .replace("${pluginVersion}", System.getenv("PLUGIN_VERSION"))
         .replace("${prettierJavaVersion}", prettierJavaVersion)

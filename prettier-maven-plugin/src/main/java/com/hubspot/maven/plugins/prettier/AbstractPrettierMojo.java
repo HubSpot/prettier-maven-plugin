@@ -11,6 +11,8 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Parameter;
 
+import com.hubspot.maven.plugins.prettier.internal.NodeInstall;
+
 public abstract class AbstractPrettierMojo extends PrettierArgs {
 
   @Parameter(defaultValue = "false")
@@ -42,7 +44,7 @@ public abstract class AbstractPrettierMojo extends PrettierArgs {
       command.addAll(globs);
 
       if (getLog().isDebugEnabled()) {
-        getLog().debug("Running prettier with args " + command);
+        getLog().debug("Running prettier with args: " + String.join(" ", command));
       }
 
       Process process = new ProcessBuilder(command.toArray(new String[0]))
@@ -78,6 +80,7 @@ public abstract class AbstractPrettierMojo extends PrettierArgs {
         }
 
         int status = process.waitFor();
+        getLog().debug("Prettier exit code: " + status);
         if (hasError) {
           prettierExecutionFailed(status);
         } else if (status != 0) {
@@ -96,23 +99,21 @@ public abstract class AbstractPrettierMojo extends PrettierArgs {
   }
 
   protected List<String> basePrettierCommand() throws MojoExecutionException {
-    Path nodeExecutable = resolveNodeExecutable();
+    NodeInstall nodeInstall = resolveNodeInstall();
 
-    Path prettierJavaDirectory = extractPrettierJava();
+    Path prettierJavaDirectory = downloadPrettierJava(nodeInstall);
 
     Path prettierBin = prettierJavaDirectory
-        .resolve("prettier-java")
         .resolve("node_modules")
         .resolve("prettier")
         .resolve("bin-prettier.js");
 
     Path prettierJavaPlugin = prettierJavaDirectory
-        .resolve("prettier-java")
         .resolve("node_modules")
         .resolve("prettier-plugin-java");
 
     List<String> command = new ArrayList<>();
-    command.add(toString(nodeExecutable));
+    command.add(nodeInstall.getNodePath());
     command.add(toString(prettierBin));
     command.add("--plugin=" + toString(prettierJavaPlugin));
     command.add("--color");

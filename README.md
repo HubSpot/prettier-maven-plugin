@@ -76,37 +76,24 @@ To format additional directories or file types via the commandline, you can pass
 
 If you want to customize the behavior of prettier, you can use a normal prettier configuration [file](https://prettier.io/docs/en/configuration.html). Alternatively, you can configure prettier directly via the Maven plugin using the following options:
 
-| Name | -D property name | Default Value | Description |
-| ---- | ---------------- | ------------- | ----------- |
-| skip | N/A | false | If set to true, plugin execution will be skipped |
-| fail | N/A | true | **Only appplies to `check` goal**. If set to true, the plugin execution will fail if any unformatted files are found |
-| generateDiff | N/A | false | **Only appplies to `check` goal. Be sure to have to sh and diff in your PATH**. If set to true, a diff will be generated between the current code and the prettier-formatted code. |
-| diffGenerator | prettier.diffGenerator | _ | **Only appplies to `check` goal**. Can be used to supply a custom implementation of [`DiffGenerator`](https://github.com/HubSpot/prettier-maven-plugin/blob/master/prettier-maven-plugin/src/main/java/com/hubspot/maven/plugins/prettier/diff/DiffGenerator.java)
-| nodeVersion | prettier.nodeVersion | 12.13.0 | Controls version of Node used to run prettier-java. Valid values can be found [here](https://github.com/HubSpot/prettier-maven-plugin/tree/master/prettier-maven-plugin/src/main/binaries/node) |
-| nodePath | prettier.nodePath | - | Can be used to supply your own node executable, rather than using one of the versions bundled with the plugin. To use the version of node on your `$PATH`, you can simply set this option to `node`. NOTE: `nodeVersion` option has no effect when using `nodePath`.  |
-| prettierJavaVersion | prettier.prettierJavaVersion | 0.7.0 | Controls version of prettier-java that is used. Valid values can be found [here](https://github.com/HubSpot/prettier-maven-plugin/tree/master/prettier-maven-plugin/src/main/binaries/prettier-java) |
-| printWidth | prettier.printWidth | `null` | If set, will be passed to prettier as `--print-width`. More information [here](https://prettier.io/docs/en/options.html#print-width) |
-| tabWidth | prettier.tabWidth | `null` | If set, will be passed to prettier as `--tab-width`. More information [here](https://prettier.io/docs/en/options.html#tab-width) |
-| useTabs | prettier.useTabs | `null` | If set, will be passed to prettier as `--use-tabs`. More information [here](https://prettier.io/docs/en/options.html#tabs) |
-| endOfLine | prettier.endOfLine | `null` | If set, will be passed to prettier as `--end-of-line`. More information [here](https://prettier.io/docs/en/options.html#end-of-line) |
-| ignoreConfigFile | prettier.ignoreConfigFile | `false` | If set to true, pretter will be invoked with `--no-config`. More information [here](https://prettier.io/docs/en/cli.html#--no-config) |
-| ignoreEditorConfig | prettier.ignoreEditorConfig | `false` | If set to true, pretter will be invoked with `--no-editorconfig`. More information [here](https://prettier.io/docs/en/cli.html#--no-editorconfig) |
-| inputGlobs | prettier.inputGlobs | `src/{main,test}/java/**/*.java` | Controls the input paths passed to prettier, useful for formatting additional directories or file types. More information [here](https://prettier.io/docs/en/cli.html#file-patterns) |
+| Name                | -D property name             | Default Value                    | Description                                                                                                                                                                                                                                                       |
+|---------------------|------------------------------|----------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| skip                | N/A                          | false                            | If set to true, plugin execution will be skipped                                                                                                                                                                                                                  |
+| fail                | N/A                          | true                             | **Only appplies to `check` goal**. If set to true, the plugin execution will fail if any unformatted files are found                                                                                                                                              |
+| generateDiff        | N/A                          | false                            | **Only appplies to `check` goal. Be sure to have to sh and diff in your PATH**. If set to true, a diff will be generated between the current code and the prettier-formatted code.                                                                                |
+| diffGenerator       | prettier.diffGenerator       | _                                | **Only appplies to `check` goal**. Can be used to supply a custom implementation of [`DiffGenerator`](https://github.com/HubSpot/prettier-maven-plugin/blob/master/prettier-maven-plugin/src/main/java/com/hubspot/maven/plugins/prettier/diff/DiffGenerator.java) 
+| nodeVersion         | prettier.nodeVersion         | 16.13.1                          | Controls version of Node used to run prettier-java.                                                                                                                                                                                                               |
+| nodePath            | prettier.nodePath            | -                                | Can be used to supply your own node executable, rather than having the plugin download it. To use the version of node on your `$PATH`, you can simply set this option to `node`.                  |
+| npmPath             | prettier.npmPath             | -                                | Can be used to supply your own npm executable, rather than having the plugin download it. To use the version of npm on your `$PATH`, you can simply set this option to `npm`.                      |
+| prettierJavaVersion | prettier.prettierJavaVersion | 0.7.0                            | Controls version of prettier-java that is used.                                                             |
+| printWidth          | prettier.printWidth          | `null`                           | If set, will be passed to prettier as `--print-width`. More information [here](https://prettier.io/docs/en/options.html#print-width)                                                                                                                              |
+| tabWidth            | prettier.tabWidth            | `null`                           | If set, will be passed to prettier as `--tab-width`. More information [here](https://prettier.io/docs/en/options.html#tab-width)                                                                                                                                  |
+| useTabs             | prettier.useTabs             | `null`                           | If set, will be passed to prettier as `--use-tabs`. More information [here](https://prettier.io/docs/en/options.html#tabs)                                                                                                                                        |
+| endOfLine           | prettier.endOfLine           | `null`                           | If set, will be passed to prettier as `--end-of-line`. More information [here](https://prettier.io/docs/en/options.html#end-of-line)                                                                                                                              |
+| ignoreConfigFile    | prettier.ignoreConfigFile    | `false`                          | If set to true, pretter will be invoked with `--no-config`. More information [here](https://prettier.io/docs/en/cli.html#--no-config)                                                                                                                             |
+| ignoreEditorConfig  | prettier.ignoreEditorConfig  | `false`                          | If set to true, pretter will be invoked with `--no-editorconfig`. More information [here](https://prettier.io/docs/en/cli.html#--no-editorconfig)                                                                                                                 |
+| inputGlobs          | prettier.inputGlobs          | `src/{main,test}/java/**/*.java` | Controls the input paths passed to prettier, useful for formatting additional directories or file types. More information [here](https://prettier.io/docs/en/cli.html#file-patterns)                                                                              |
 
-### Developing the plugin
+### Note
 
-For convenience, this plugin bundles Node, prettier, and prettier-java. Over time, these bundled dependencies will need to be kept up to date. Below are some directions for adding new versions of Node and prettier-java.
-
-#### Adding new versions of node
-
-You can download binaries for Linux/OSX/Windows from here:
-https://nodejs.org/en/about/releases/
-
-1. Make a new folder located at `prettier-maven-plugin/src/main/binaries/node/{node-version}` and drop the binaries in there using the existing name formatting.
-2. Update the pom.xml to attach these new binaries
-
-#### Adding new versions of prettier-java
-
-1. Run `./create-prettier-java-zip.sh {prettier-java-version}` which will spit out the location of a zip file
-2. Make a new folder located at `src/main/binaries/prettier-java/{prettier-java-version}` and copy the zip file under there
-3. Update the pom.xml to attach this zip file
+For convenience, this plugin downloads Node, prettier, and prettier-java as needed. Node is downloaded from https://nodejs.org/dist/ and prettier-plugin-java is downloaded via npm
