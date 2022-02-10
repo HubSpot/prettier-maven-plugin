@@ -41,7 +41,7 @@ This example will run the `check` goal inside of Travis CI, and the `write` goal
             <goal>${plugin.prettier.goal}</goal>
           </goals>
         </execution>
-      </executions>      
+      </executions>
     </plugin>
   </plugins>
 </build>
