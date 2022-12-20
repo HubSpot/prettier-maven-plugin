@@ -7,8 +7,8 @@ import java.nio.file.attribute.FileAttribute;
 import java.nio.file.attribute.PosixFilePermission;
 import java.nio.file.attribute.PosixFilePermissions;
 import java.util.Arrays;
+import java.util.Optional;
 import java.util.Set;
-
 import org.apache.maven.plugin.MojoExecutionException;
 
 public enum OperatingSystemFamily {
@@ -49,6 +49,14 @@ public enum OperatingSystemFamily {
       return OperatingSystemFamily.WINDOWS_X64;
     } else {
       throw new MojoExecutionException("Unknown os.name " + osFullName);
+    }
+  }
+
+  public Optional<OperatingSystemFamily> getFallback() {
+    if (this == MAC_ARM) {
+      return Optional.of(MAC_X64);
+    } else {
+      return Optional.empty();
     }
   }
 
