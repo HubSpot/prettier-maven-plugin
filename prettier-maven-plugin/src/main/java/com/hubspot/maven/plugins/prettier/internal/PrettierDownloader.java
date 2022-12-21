@@ -46,6 +46,8 @@ public class PrettierDownloader {
 
     List<String> command = new ArrayList<>(nodeInstall.getNpmCommand());
     command.add("install");
+    command.add("--prefix");
+    command.add(".");
     command.add("prettier-plugin-java@" + prettierJavaVersion);
 
     log.debug("Running npm install command: " + command);
