@@ -10,7 +10,6 @@ import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.BasicFileAttributes;
-
 import org.apache.maven.plugin.MojoExecutionException;
 
 public class FileUtils {
@@ -40,11 +39,55 @@ public class FileUtils {
     }
   }
 
+  public static Path copyDirectory(Path source) throws MojoExecutionException {
+    Path mutableTmpDir = null;
+    try {
+      Path tmpDir = Files.createTempDirectory(
+          source.getParent(),
+          "prettier-java-", OperatingSystemFamily.current().getGlobalPermissions()
+      );
+
+      mutableTmpDir = tmpDir;
+
+      Files.walkFileTree(
+          source,
+          new SimpleFileVisitor<>() {
+
+            @Override
+            public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
+              // we already created the root directory
+              if (!source.equals(dir)) {
+                Path target = tmpDir.resolve(source.relativize(dir));
+                Files.copy(dir, target, StandardCopyOption.COPY_ATTRIBUTES);
+              }
+              return FileVisitResult.CONTINUE;
+            }
+
+            @Override
+            public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+              Path target = tmpDir.resolve(source.relativize(file));
+              Files.copy(file, target, StandardCopyOption.COPY_ATTRIBUTES);
+              return FileVisitResult.CONTINUE;
+            }
+          }
+      );
+
+      return tmpDir;
+    } catch (IOException e) {
+      if (mutableTmpDir != null) {
+        // don't leave tmp dir hanging around
+        deleteDirectory(mutableTmpDir);
+      }
+
+      throw new MojoExecutionException("Error copying directory: " + source, e);
+    }
+  }
+
   private static void deleteDirectory(Path directory) throws MojoExecutionException {
     try {
       Files.walkFileTree(
           directory,
-          new SimpleFileVisitor<Path>() {
+          new SimpleFileVisitor<>() {
 
             @Override
             public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
