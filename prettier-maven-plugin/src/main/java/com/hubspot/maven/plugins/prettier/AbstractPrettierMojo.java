@@ -1,5 +1,6 @@
 package com.hubspot.maven.plugins.prettier;
 
+import com.hubspot.maven.plugins.prettier.internal.NodeInstall;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -10,8 +11,6 @@ import java.util.List;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Parameter;
-
-import com.hubspot.maven.plugins.prettier.internal.NodeInstall;
 
 public abstract class AbstractPrettierMojo extends PrettierArgs {
 
@@ -98,7 +97,7 @@ public abstract class AbstractPrettierMojo extends PrettierArgs {
     );
   }
 
-  protected List<String> basePrettierCommand() throws MojoExecutionException {
+  protected List<String> basePrettierCommand() throws MojoExecutionException, MojoFailureException {
     NodeInstall nodeInstall = resolveNodeInstall();
 
     Path prettierJavaDirectory = downloadPrettierJava(nodeInstall);

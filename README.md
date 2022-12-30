@@ -1,6 +1,6 @@
 # prettier-maven-plugin
 
-Maven plugin for running [prettier-java](https://github.com/jhipster/prettier-java) during a build. Node, prettier, and prettier-java are bundled into the plugin.
+Maven plugin for running [prettier-java](https://github.com/jhipster/prettier-java) during a build. Node, prettier, and prettier-java are downloaded automatically as needed.
 
 There is a `check` goal which (optionally) fails the build if code isn't formatted correctly, and a `write` goal which rewrites the source code in place. A common setup might be to use the `write` goal during local builds, and the `check` goal during CI builds.
 
@@ -21,7 +21,7 @@ This example will run the `check` goal inside of Travis CI, and the `write` goal
       <artifactId>prettier-maven-plugin</artifactId>
       <version>0.16</version>
       <configuration>
-        <prettierJavaVersion>1.5.0</prettierJavaVersion>
+        <prettierJavaVersion>2.0.0</prettierJavaVersion>
         <printWidth>90</printWidth>
         <tabWidth>2</tabWidth>
         <useTabs>false</useTabs>
@@ -93,6 +93,7 @@ If you want to customize the behavior of prettier, you can use a normal prettier
 | ignoreConfigFile    | prettier.ignoreConfigFile    | `false`                          | If set to true, pretter will be invoked with `--no-config`. More information [here](https://prettier.io/docs/en/cli.html#--no-config)                                                                                                                             |
 | ignoreEditorConfig  | prettier.ignoreEditorConfig  | `false`                          | If set to true, pretter will be invoked with `--no-editorconfig`. More information [here](https://prettier.io/docs/en/cli.html#--no-editorconfig)                                                                                                                 |
 | inputGlobs          | prettier.inputGlobs          | `src/{main,test}/java/**/*.java` | Controls the input paths passed to prettier, useful for formatting additional directories or file types. More information [here](https://prettier.io/docs/en/cli.html#file-patterns)                                                                              |
+| disableGenericsLinebreaks | prettier.disableGenericsLinebreaks | `false` | Prevents prettier from adding linebreaks to generic type declarations (see https://github.com/HubSpot/prettier-maven-plugin/pull/78 for more background) |
 
 ### Note
 

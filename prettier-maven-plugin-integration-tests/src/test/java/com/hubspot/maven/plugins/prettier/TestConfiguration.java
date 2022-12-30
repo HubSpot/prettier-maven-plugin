@@ -1,10 +1,9 @@
 package com.hubspot.maven.plugins.prettier;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Preconditions;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class TestConfiguration {
   public enum Goal {
@@ -41,7 +40,7 @@ public class TestConfiguration {
     return template
         .replace(
             "${nodeVersion}",
-            MoreObjects.firstNonNull(System.getenv("PRETTIER_NODE_VERSION"), "16.13.2")
+            MoreObjects.firstNonNull(System.getenv("PRETTIER_NODE_VERSION"), "19.3.0")
         )
         .replace("${pluginVersion}", System.getenv("PLUGIN_VERSION"))
         .replace("${prettierJavaVersion}", prettierJavaVersion)

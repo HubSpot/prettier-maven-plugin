@@ -1,16 +1,16 @@
 package com.hubspot.maven.plugins.prettier;
 
+import com.hubspot.maven.plugins.prettier.internal.NodeInstall;
 import java.nio.file.Path;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Mojo;
-
-import com.hubspot.maven.plugins.prettier.internal.NodeInstall;
 
 @Mojo(name = "print-args", requiresProject = false)
 public class PrintArgsMojo extends PrettierArgs {
 
   @Override
-  public final void execute() throws MojoExecutionException {
+  public final void execute() throws MojoExecutionException, MojoFailureException {
     NodeInstall nodeInstall = resolveNodeInstall();
 
     Path prettierJavaDirectory = downloadPrettierJava(nodeInstall);
