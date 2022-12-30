@@ -1,5 +1,8 @@
 package com.hubspot.maven.plugins.prettier;
 
+import com.google.common.collect.ImmutableSet;
+import com.google.common.io.CharStreams;
+import com.google.common.io.Resources;
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -17,10 +20,6 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import com.google.common.collect.ImmutableSet;
-import com.google.common.io.CharStreams;
-import com.google.common.io.Resources;
-
 public abstract class AbstractPrettierMojoTest {
   private static final Logger LOG = Logger.getLogger(AbstractPrettierMojoTest.class.getName());
 
@@ -34,7 +33,7 @@ public abstract class AbstractPrettierMojoTest {
   protected static final String EMPTY = "empty/*.java";
   protected static final String BUILD_SUCCESS = "BUILD SUCCESS";
   protected static final String BUILD_FAILURE = "BUILD FAILURE";
-  private static final Set<String> PRETTIER_JAVA_VERSIONS_TO_TEST = ImmutableSet.of("1.5.0", "1.6.1");
+  private static final Set<String> PRETTIER_JAVA_VERSIONS_TO_TEST = ImmutableSet.of("1.6.2", "2.0.0");
 
   protected static Set<String> getPrettierJavaVersionsToTest() {
     return PRETTIER_JAVA_VERSIONS_TO_TEST;
