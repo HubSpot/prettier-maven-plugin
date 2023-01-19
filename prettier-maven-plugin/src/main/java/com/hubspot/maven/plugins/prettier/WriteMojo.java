@@ -2,7 +2,6 @@ package com.hubspot.maven.plugins.prettier;
 
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
-
 import org.apache.maven.plugins.annotations.Mojo;
 
 @Mojo(name = "write", threadSafe = true)
@@ -19,9 +18,10 @@ public class WriteMojo extends AbstractPrettierMojo {
   @Override
   protected void handlePrettierLogLine(String line) {
     // colorized lines have no changes
-    if (line.endsWith("ms") && !COLORIZED_LINE.test(line)) {
-      getLog().info("Reformatted file: " + line);
-    }
+//    if (line.endsWith("ms") && !COLORIZED_LINE.test(line)) {
+//      getLog().info("Reformatted file: " + line);
+//    }
+    getLog().info(line);
   }
 
   @Override
