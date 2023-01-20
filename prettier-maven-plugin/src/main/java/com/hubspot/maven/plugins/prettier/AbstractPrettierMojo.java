@@ -26,6 +26,7 @@ public abstract class AbstractPrettierMojo extends PrettierArgs {
 
   @Override
   public final void execute() throws MojoExecutionException, MojoFailureException {
+    // a trivial change
     if (skip) {
       getLog().info("Skipping plugin execution");
       return;
