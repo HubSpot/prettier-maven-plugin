@@ -49,6 +49,10 @@ public class CheckMojo extends AbstractPrettierMojo {
       } else {
         getLog().warn(message);
       }
+    } else {
+       if (getLog().isDebugEnabled()) {
+        getLog().debug("Prettier output >" + line);
+      }
     }
   }
 
