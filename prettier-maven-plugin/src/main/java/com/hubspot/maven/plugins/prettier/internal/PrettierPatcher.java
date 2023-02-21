@@ -23,21 +23,26 @@ public class PrettierPatcher {
 
   public Path patch(URL patch) throws MojoExecutionException {
     Path patchDirectory = originalDirectory.resolveSibling(originalDirectory.getFileName() + "-patched");
+    Path prettierBin = patchDirectory.resolve("node_modules/prettier/bin-prettier.js");
 
-    if (Files.exists(patchDirectory)) {
+    if (Files.exists(patchDirectory) && Files.exists(prettierBin)) {
       log.debug("Reusing patched prettier-java at: " + patchDirectory);
-    } else {
-      try {
-        Path tmpDir = FileUtils.copyDirectory(originalDirectory);
-        applyPatch(patch, tmpDir);
-        FileUtils.move(tmpDir, patchDirectory);
-        log.debug("Patched prettier-java to: " + patchDirectory);
-      } catch (IOException e) {
-        throw new MojoExecutionException("Error patching prettier-java", e);
-      }
+      return patchDirectory;
+    } else if (Files.exists(patchDirectory) && !Files.exists(prettierBin)) {
+      log.warn("Corrupted patched prettier install, going to delete and re-download");
+      FileUtils.deleteDirectory(patchDirectory);
     }
 
-    return patchDirectory;
+    try {
+      Path tmpDir = FileUtils.copyDirectory(originalDirectory);
+      applyPatch(patch, tmpDir);
+      FileUtils.move(tmpDir, patchDirectory);
+
+      log.info("Patched prettier-java to: " + patchDirectory);
+      return patchDirectory;
+    } catch (IOException e) {
+      throw new MojoExecutionException("Error patching prettier-java", e);
+    }
   }
 
   private void applyPatch(URL patch, Path directory) throws MojoExecutionException, IOException {
