@@ -9,6 +9,7 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.logging.Log;
 
 public class PrettierDownloader {
+  private static final String PRETTIER_BIN_PATH = "node_modules/prettier/bin-prettier.js";
   private final Path installDirectory;
   private final NodeInstall nodeInstall;
   private final Log log;
@@ -21,7 +22,7 @@ public class PrettierDownloader {
 
   public Path downloadPrettierJava(String prettierJavaVersion) throws MojoExecutionException {
     Path prettierDirectory = installDirectory.resolve("prettier-java-" + prettierJavaVersion);
-    Path prettierBin = prettierDirectory.resolve("node_modules/prettier/bin-prettier.js");
+    Path prettierBin = prettierDirectory.resolve(PRETTIER_BIN_PATH);
 
     if (Files.exists(prettierDirectory) && Files.exists(prettierBin)) {
       log.debug("Reusing cached prettier-java at: " + prettierDirectory);
@@ -63,8 +64,12 @@ public class PrettierDownloader {
 
     try {
       int exitCode = process.waitFor();
+      boolean prettierBinExists = Files.exists(tmpDir.resolve(PRETTIER_BIN_PATH));
       if (exitCode != 0) {
         throw new MojoExecutionException("Error downloading prettier-java, exit code: " + exitCode);
+      }
+      if (!prettierBinExists) {
+        throw new MojoExecutionException("Error downloading prettier-java, prettier bin was not found");
       }
     } catch (InterruptedException e) {
       throw new MojoExecutionException("Interrupted while downloading prettier-java", e);
