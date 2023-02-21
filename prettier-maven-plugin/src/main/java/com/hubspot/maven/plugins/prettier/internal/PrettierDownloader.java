@@ -5,11 +5,11 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
-
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.logging.Log;
 
 public class PrettierDownloader {
+  private static final String PRETTIER_BIN_PATH = "node_modules/prettier/bin-prettier.js";
   private final Path installDirectory;
   private final NodeInstall nodeInstall;
   private final Log log;
@@ -22,20 +22,25 @@ public class PrettierDownloader {
 
   public Path downloadPrettierJava(String prettierJavaVersion) throws MojoExecutionException {
     Path prettierDirectory = installDirectory.resolve("prettier-java-" + prettierJavaVersion);
+    Path prettierBin = prettierDirectory.resolve(PRETTIER_BIN_PATH);
 
-    if (Files.exists(prettierDirectory)) {
+    if (Files.exists(prettierDirectory) && Files.exists(prettierBin)) {
       log.debug("Reusing cached prettier-java at: " + prettierDirectory);
-    } else {
-      try {
-        Path tmpDir = installPrettierJavaToTmpDir(prettierJavaVersion);
-        FileUtils.move(tmpDir, prettierDirectory);
-        log.debug("Downloaded prettier-java to: " + prettierDirectory);
-      } catch (IOException e) {
-        throw new MojoExecutionException("Error downloading prettier-java", e);
-      }
+      return prettierDirectory;
+    } else if (Files.exists(prettierDirectory) && !Files.exists(prettierBin)) {
+      log.warn("Corrupted prettier install, going to delete and re-download");
+      FileUtils.deleteDirectory(prettierDirectory);
     }
 
-    return prettierDirectory;
+    try {
+      Path tmpDir = installPrettierJavaToTmpDir(prettierJavaVersion);
+      FileUtils.move(tmpDir, prettierDirectory);
+
+      log.info("Downloaded prettier-java to: " + prettierDirectory);
+      return prettierDirectory;
+    } catch (IOException e) {
+      throw new MojoExecutionException("Error downloading prettier-java", e);
+    }
   }
 
   private Path installPrettierJavaToTmpDir(String prettierJavaVersion) throws MojoExecutionException, IOException {
@@ -59,8 +64,12 @@ public class PrettierDownloader {
 
     try {
       int exitCode = process.waitFor();
+      boolean prettierBinExists = Files.exists(tmpDir.resolve(PRETTIER_BIN_PATH));
       if (exitCode != 0) {
         throw new MojoExecutionException("Error downloading prettier-java, exit code: " + exitCode);
+      }
+      if (!prettierBinExists) {
+        throw new MojoExecutionException("Error downloading prettier-java, prettier bin was not found");
       }
     } catch (InterruptedException e) {
       throw new MojoExecutionException("Interrupted while downloading prettier-java", e);

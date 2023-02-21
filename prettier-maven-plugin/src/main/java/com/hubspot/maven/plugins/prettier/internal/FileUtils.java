@@ -83,7 +83,7 @@ public class FileUtils {
     }
   }
 
-  private static void deleteDirectory(Path directory) throws MojoExecutionException {
+  public static void deleteDirectory(Path directory) throws MojoExecutionException {
     try {
       Files.walkFileTree(
           directory,
