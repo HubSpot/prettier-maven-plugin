@@ -36,6 +36,7 @@
   <properties>
     <basepom.check.skip-license>true</basepom.check.skip-license>
     <basepom.check.skip-spotbugs>true</basepom.check.skip-spotbugs>
+    <basepom.deploy.skip>false</basepom.deploy.skip>
     <basepom.install.skip>${maven.install.skip}</basepom.install.skip>
     <maven.install.skip>false</maven.install.skip>
 
