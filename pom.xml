@@ -36,6 +36,8 @@
   <properties>
     <basepom.check.skip-license>true</basepom.check.skip-license>
     <basepom.check.skip-spotbugs>true</basepom.check.skip-spotbugs>
+    <basepom.install.skip>${maven.install.skip}</basepom.install.skip>
+    <maven.install.skip>false</maven.install.skip>
 
     <!-- version 3.0.0-M1 doesn't seem to work with our GCS wagon -->
     <dep.plugin.deploy.version>2.8.2</dep.plugin.deploy.version>
