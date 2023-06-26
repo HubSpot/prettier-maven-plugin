@@ -100,7 +100,11 @@ public abstract class PrettierArgs extends AbstractMojo {
     }
 
     if (maybeNode.isPresent() && maybeNpm.isPresent()) {
-      return new NodeInstall(maybeNode.get(), Arrays.asList(maybeNpm.get()));
+      if (maybeNpm.get().endsWith("npm-cli.js")) {
+        return new NodeInstall(maybeNode.get(), Arrays.asList(maybeNode.get(), maybeNpm.get()));
+      } else {
+        return new NodeInstall(maybeNode.get(), Arrays.asList(maybeNpm.get()));
+      }
     } else {
       NodeInstall nodeInstall = downloadNode();
 
