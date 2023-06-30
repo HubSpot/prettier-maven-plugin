@@ -7,20 +7,24 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.Optional;
+
+import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugin.logging.Log;
+
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
-import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugin.logging.Log;
 
 public class NodeDownloader {
   private static final OkHttpClient HTTP_CLIENT = new OkHttpClient();
 
+  private final Optional<String> customDownloadUrl;
   private final Path installDirectory;
   private final Log log;
 
-  public NodeDownloader(Path installDirectory, Log log) {
+  public NodeDownloader(Optional<String> customDownloadUrl, Path installDirectory, Log log) {
+    this.customDownloadUrl = customDownloadUrl;
     this.installDirectory = installDirectory;
     this.log = log;
   }
@@ -36,7 +40,7 @@ public class NodeDownloader {
     if (Files.exists(targetDirectory)) {
       log.debug("Reusing cached node at: " + targetDirectory);
     } else {
-      String downloadUrl = os.getNodeDownloadUrl(version);
+      String downloadUrl = customDownloadUrl.orElseGet(() -> os.getNodeDownloadUrl(version));
       log.debug("Downloading node from url: " + downloadUrl);
 
       Optional<Path> maybeNodeArchive = downloadToTmpFile(downloadUrl);
