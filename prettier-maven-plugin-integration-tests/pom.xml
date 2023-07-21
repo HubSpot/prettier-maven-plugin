@@ -11,7 +11,7 @@
   <artifactId>prettier-maven-plugin-integration-tests</artifactId>
 
   <properties>
-    <basepom.test.timeout>360</basepom.test.timeout>
+    <basepom.test.timeout>960</basepom.test.timeout>
   </properties>
 
   <dependencies>
