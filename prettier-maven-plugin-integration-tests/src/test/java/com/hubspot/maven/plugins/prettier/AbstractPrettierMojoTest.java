@@ -33,7 +33,7 @@ public abstract class AbstractPrettierMojoTest {
   protected static final String EMPTY = "empty/*.java";
   protected static final String BUILD_SUCCESS = "BUILD SUCCESS";
   protected static final String BUILD_FAILURE = "BUILD FAILURE";
-  private static final Set<String> PRETTIER_JAVA_VERSIONS_TO_TEST = ImmutableSet.of("1.6.2", "2.0.0");
+  private static final Set<String> PRETTIER_JAVA_VERSIONS_TO_TEST = ImmutableSet.of("1.6.2", "2.0.0", "2.2.0");
 
   protected static Set<String> getPrettierJavaVersionsToTest() {
     return PRETTIER_JAVA_VERSIONS_TO_TEST;

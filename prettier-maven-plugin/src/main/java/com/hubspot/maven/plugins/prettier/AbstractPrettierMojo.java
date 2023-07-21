@@ -1,6 +1,7 @@
 package com.hubspot.maven.plugins.prettier;
 
 import com.hubspot.maven.plugins.prettier.internal.NodeInstall;
+import com.hubspot.maven.plugins.prettier.internal.PrettierPaths;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -102,14 +103,8 @@ public abstract class AbstractPrettierMojo extends PrettierArgs {
 
     Path prettierJavaDirectory = downloadPrettierJava(nodeInstall);
 
-    Path prettierBin = prettierJavaDirectory
-        .resolve("node_modules")
-        .resolve("prettier")
-        .resolve("bin-prettier.js");
-
-    Path prettierJavaPlugin = prettierJavaDirectory
-        .resolve("node_modules")
-        .resolve("prettier-plugin-java");
+    Path prettierBin = prettierJavaDirectory.resolve(PrettierPaths.prettierBinPath(prettierJavaVersion));
+    Path prettierJavaPlugin = prettierJavaDirectory.resolve(PrettierPaths.prettierJavaPluginPath(prettierJavaVersion));
 
     List<String> command = new ArrayList<>();
     command.add(nodeInstall.getNodePath());

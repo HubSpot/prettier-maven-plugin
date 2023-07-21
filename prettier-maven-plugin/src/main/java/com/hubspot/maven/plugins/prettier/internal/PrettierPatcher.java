@@ -21,9 +21,9 @@ public class PrettierPatcher {
     this.log = log;
   }
 
-  public Path patch(URL patch) throws MojoExecutionException {
+  public Path patch(URL patch, String prettierJavaVersion) throws MojoExecutionException {
     Path patchDirectory = originalDirectory.resolveSibling(originalDirectory.getFileName() + "-patched");
-    Path prettierBin = patchDirectory.resolve("node_modules/prettier/bin-prettier.js");
+    Path prettierBin = patchDirectory.resolve(PrettierPaths.prettierBinPath(prettierJavaVersion));
 
     if (Files.exists(patchDirectory) && Files.exists(prettierBin)) {
       log.debug("Reusing patched prettier-java at: " + patchDirectory);
