@@ -1,6 +1,7 @@
 package com.hubspot.maven.plugins.prettier;
 
 import com.hubspot.maven.plugins.prettier.internal.NodeInstall;
+import com.hubspot.maven.plugins.prettier.internal.PrettierPaths;
 import java.nio.file.Path;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
@@ -14,15 +15,8 @@ public class PrintArgsMojo extends PrettierArgs {
     NodeInstall nodeInstall = resolveNodeInstall();
 
     Path prettierJavaDirectory = downloadPrettierJava(nodeInstall);
-
-    Path prettierBin = prettierJavaDirectory
-      .resolve("node_modules")
-      .resolve("prettier")
-      .resolve("bin-prettier.js");
-
-    Path prettierJavaPlugin = prettierJavaDirectory
-      .resolve("node_modules")
-      .resolve("prettier-plugin-java");
+    Path prettierBin = prettierJavaDirectory.resolve(PrettierPaths.prettierBinPath(prettierJavaVersion));
+    Path prettierJavaPlugin = prettierJavaDirectory.resolve(PrettierPaths.prettierJavaPluginPath(prettierJavaVersion));
 
     /*
     Use System.out rather than getLog() because we don't want any leading characters

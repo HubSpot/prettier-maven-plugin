@@ -87,9 +87,9 @@
         <version>2.11.4</version>
       </dependency>
       <dependency>
-        <groupId>junit</groupId>
-        <artifactId>junit</artifactId>
-        <version>4.13.2</version>
+        <groupId>org.junit.jupiter</groupId>
+        <artifactId>junit-jupiter-api</artifactId>
+        <version>5.9.3</version>
       </dependency>
       <dependency>
         <groupId>org.assertj</groupId>
@@ -115,19 +115,4 @@
       </plugins>
     </pluginManagement>
   </build>
-
-  <profiles>
-    <profile>
-      <id>travis</id>
-      <activation>
-        <property>
-          <name>env.TRAVIS</name>
-        </property>
-      </activation>
-      <properties>
-        <basepom.test.reuse-vm>false</basepom.test.reuse-vm>
-        <basepom.test.fork-count>1</basepom.test.fork-count>
-      </properties>
-    </profile>
-  </profiles>
 </project>
