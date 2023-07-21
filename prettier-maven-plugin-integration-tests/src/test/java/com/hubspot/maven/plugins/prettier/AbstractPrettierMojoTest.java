@@ -76,10 +76,6 @@ public abstract class AbstractPrettierMojoTest {
     }
   }
 
-  protected static boolean isNewishVersion(String prettierJavaVersion) {
-    return prettierJavaVersion.startsWith("1.");
-  }
-
   protected static String reformattedFile(String pattern) {
     return "Reformatted file: " + pattern.substring(0, pattern.indexOf('/'));
   }

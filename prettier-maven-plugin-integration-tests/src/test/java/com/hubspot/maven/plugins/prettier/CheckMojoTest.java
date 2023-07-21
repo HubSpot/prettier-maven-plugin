@@ -2,11 +2,9 @@ package com.hubspot.maven.plugins.prettier;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.util.Arrays;
-
-import org.junit.Test;
-
 import com.hubspot.maven.plugins.prettier.TestConfiguration.Goal;
+import java.util.Arrays;
+import org.junit.Test;
 
 public class CheckMojoTest extends AbstractPrettierMojoTest {
 
@@ -207,9 +205,7 @@ public class CheckMojoTest extends AbstractPrettierMojoTest {
 
       assertThat(result.getSuccess()).isTrue();
       assertThat(result.getOutput()).contains(BUILD_SUCCESS);
-      if (isNewishVersion(prettierJavaVersion)) {
-        assertThat(result.getOutput()).contains(noMatchingFiles(EMPTY));
-      }
+      assertThat(result.getOutput()).contains(noMatchingFiles(EMPTY));
     }
   }
 
@@ -247,9 +243,7 @@ public class CheckMojoTest extends AbstractPrettierMojoTest {
       assertThat(result.getOutput()).contains(BUILD_SUCCESS);
       assertThat(result.getOutput()).doesNotContain(noMatchingFiles(JAVA_GOOD_FORMATTING));
       assertThat(result.getOutput()).doesNotContain(noMatchingFiles(JS_GOOD_FORMATTING));
-      if (isNewishVersion(prettierJavaVersion)) {
-        assertThat(result.getOutput()).contains(noMatchingFiles(EMPTY));
-      }
+      assertThat(result.getOutput()).contains(noMatchingFiles(EMPTY));
     }
   }
 
@@ -269,9 +263,7 @@ public class CheckMojoTest extends AbstractPrettierMojoTest {
       assertThat(result.getOutput()).contains(BUILD_FAILURE);
       assertThat(result.getOutput()).contains(incorrectlyFormattedFile(JAVA_BAD_FORMATTING));
       assertThat(result.getOutput()).contains(incorrectlyFormattedFile(JS_BAD_FORMATTING));
-      if (isNewishVersion(prettierJavaVersion)) {
-        assertThat(result.getOutput()).contains(noMatchingFiles(EMPTY));
-      }
+      assertThat(result.getOutput()).contains(noMatchingFiles(EMPTY));
     }
   }
 }
