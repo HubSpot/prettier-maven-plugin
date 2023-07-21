@@ -115,19 +115,4 @@
       </plugins>
     </pluginManagement>
   </build>
-
-  <profiles>
-    <profile>
-      <id>travis</id>
-      <activation>
-        <property>
-          <name>env.TRAVIS</name>
-        </property>
-      </activation>
-      <properties>
-        <basepom.test.reuse-vm>false</basepom.test.reuse-vm>
-        <basepom.test.fork-count>1</basepom.test.fork-count>
-      </properties>
-    </profile>
-  </profiles>
 </project>
