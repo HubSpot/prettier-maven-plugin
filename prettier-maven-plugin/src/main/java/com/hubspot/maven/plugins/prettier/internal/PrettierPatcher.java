@@ -16,9 +16,12 @@ public class PrettierPatcher {
   private final Path originalDirectory;
   private final Log log;
 
-  public PrettierPatcher(Path originalDirectory, Log log) {
+  private final String patchCommand;
+
+  public PrettierPatcher(Path originalDirectory, Log log, String patchCommand) {
     this.originalDirectory = originalDirectory;
     this.log = log;
+    this.patchCommand = patchCommand;
   }
 
   public Path patch(URL patch, String prettierJavaVersion) throws MojoExecutionException {
@@ -46,7 +49,7 @@ public class PrettierPatcher {
   }
 
   private void applyPatch(URL patch, Path directory) throws MojoExecutionException, IOException {
-    List<String> command = Arrays.asList("patch", "-p1", "-f");
+    List<String> command = Arrays.asList(patchCommand, "-p1", "-f");
     log.debug("Running patch command: " + command);
 
     Process process = new ProcessBuilder(command.toArray(new String[0]))
