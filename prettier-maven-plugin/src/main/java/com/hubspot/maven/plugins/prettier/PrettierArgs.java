@@ -78,9 +78,6 @@ public abstract class PrettierArgs extends AbstractMojo {
   @Parameter(defaultValue = "false", property = "prettier.disableGenericsLinebreaks")
   protected boolean disableGenericsLinebreaks;
 
-  @Parameter(defaultValue = "/usr/bin/patch", property = "prettier.patchCommand")
-  protected String patchCommand;
-
   @Nullable
   @Parameter(property = "prettier.endOfLine")
   protected String endOfLine;
@@ -139,7 +136,7 @@ public abstract class PrettierArgs extends AbstractMojo {
       if (disableGenericsLinebreaks) {
         if (prettierJavaVersion.startsWith("2")) {
           URL patch = Resources.getResource("no-linebreak-generics.patch");
-          return new PrettierPatcher(prettierJava, getLog(), patchCommand).patch(patch, prettierJavaVersion);
+          return new PrettierPatcher(prettierJava, getLog()).patch(patch, prettierJavaVersion);
         } else if ("1.5.0".compareTo(prettierJavaVersion) > 0) {
           // versions before 1.5.0 don't linebreak generics
           return prettierJava;
