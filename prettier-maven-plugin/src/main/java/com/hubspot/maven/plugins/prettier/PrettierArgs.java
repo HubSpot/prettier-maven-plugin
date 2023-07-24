@@ -78,7 +78,7 @@ public abstract class PrettierArgs extends AbstractMojo {
   @Parameter(defaultValue = "false", property = "prettier.disableGenericsLinebreaks")
   protected boolean disableGenericsLinebreaks;
 
-  @Parameter(defaultValue = "patch", property = "prettier.patchCommand")
+  @Parameter(defaultValue = "/usr/bin/patch", property = "prettier.patchCommand")
   protected String patchCommand;
 
   @Nullable

@@ -94,7 +94,7 @@ If you want to customize the behavior of prettier, you can use a normal prettier
 | ignoreEditorConfig  | prettier.ignoreEditorConfig  | `false`                          | If set to true, pretter will be invoked with `--no-editorconfig`. More information [here](https://prettier.io/docs/en/cli.html#--no-editorconfig)                                                                                                                 |
 | inputGlobs          | prettier.inputGlobs          | `src/{main,test}/java/**/*.java` | Controls the input paths passed to prettier, useful for formatting additional directories or file types. More information [here](https://prettier.io/docs/en/cli.html#file-patterns)                                                                              |
 | disableGenericsLinebreaks | prettier.disableGenericsLinebreaks | `false` | Prevents prettier from adding linebreaks to generic type declarations (see https://github.com/HubSpot/prettier-maven-plugin/pull/78 for more background) |
-| patchCommand        | prettier.patchCommand        | `patch`                          | Patch command to use for `disableGenericsLinebreaks` (i.e. `"/usr/bin/patch"`)  |
+| patchCommand        | prettier.patchCommand        | `/usr/bin/patch`                          | Patch command to use for `disableGenericsLinebreaks`  |
 
 ### Note
 
