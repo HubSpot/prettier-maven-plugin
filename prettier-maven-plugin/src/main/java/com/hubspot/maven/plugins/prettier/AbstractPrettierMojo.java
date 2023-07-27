@@ -9,11 +9,14 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Parameter;
 
 public abstract class AbstractPrettierMojo extends PrettierArgs {
+
+  private static final DefaultArtifactVersion OLD_VERSION = new DefaultArtifactVersion("0.8.1");
 
   @Parameter(defaultValue = "false")
   private boolean skip;
@@ -51,32 +54,25 @@ public abstract class AbstractPrettierMojo extends PrettierArgs {
         .directory(project.getBasedir())
         .start();
       try (
-        InputStreamReader stdoutReader = new InputStreamReader(
-          process.getInputStream(),
-          StandardCharsets.UTF_8
-        );
-        BufferedReader stdout = new BufferedReader(stdoutReader);
-        InputStreamReader stderrReader = new InputStreamReader(
-          process.getErrorStream(),
+          InputStreamReader stdoutReader = new InputStreamReader(
+              process.getInputStream(),
+            StandardCharsets.UTF_8
+          );
+          BufferedReader stdout = new BufferedReader(stdoutReader);
+          InputStreamReader stderrReader = new InputStreamReader(
+            process.getErrorStream(),
           StandardCharsets.UTF_8
         );
         BufferedReader stderr = new BufferedReader(stderrReader)
       ) {
-        String line;
-        while ((line = stdout.readLine()) != null) {
-          handlePrettierLogLine(line);
-        }
-
         boolean hasError = false;
-        while ((line = stderr.readLine()) != null) {
-          if (line.contains("No matching files.") || line.contains("No files matching")) {
-            getLog().info(trimLogLevel(line));
-          } else if (line.contains("error")) {
-            getLog().error(trimLogLevel(line));
-            hasError = true;
-          } else {
-            handlePrettierLogLine(line);
-          }
+        if( new DefaultArtifactVersion(prettierJavaVersion).compareTo(OLD_VERSION) > 0){
+          hasError = readFromStdErr(stderr);
+          readFromStdOut(stdout);
+        }
+        else{
+          readFromStdOut(stdout);
+          hasError = readFromStdErr(stderr);
         }
 
         int status = process.waitFor();
@@ -90,6 +86,29 @@ public abstract class AbstractPrettierMojo extends PrettierArgs {
     } catch (IOException | InterruptedException e) {
       throw new MojoExecutionException("Error trying to run prettier-java", e);
     }
+  }
+
+  private boolean readFromStdErr(BufferedReader stderr) throws IOException {
+    String line;
+    boolean hasError = false;
+    while ((line = stderr.readLine()) != null) {
+      if (line.contains("No matching files.") || line.contains("No files matching")) {
+        getLog().info(trimLogLevel(line));
+      } else if (line.contains("error")) {
+        getLog().error(trimLogLevel(line));
+        hasError = true;
+      } else {
+        handlePrettierLogLine(line);
+      }
+    }
+    return hasError;
+  }
+
+  private void readFromStdOut(BufferedReader stdout) throws IOException {
+    String line;
+    while ((line = stdout.readLine()) != null) {
+    handlePrettierLogLine(line);
+   }
   }
 
   protected static MojoExecutionException prettierExecutionFailed(int status) throws MojoExecutionException {
