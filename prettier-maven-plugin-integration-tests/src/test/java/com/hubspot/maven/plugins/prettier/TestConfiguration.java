@@ -1,8 +1,7 @@
 package com.hubspot.maven.plugins.prettier;
 
-import com.google.common.base.MoreObjects;
-import com.google.common.base.Preconditions;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class TestConfiguration {
@@ -40,7 +39,7 @@ public class TestConfiguration {
     return template
         .replace(
             "${nodeVersion}",
-            MoreObjects.firstNonNull(System.getenv("PRETTIER_NODE_VERSION"), "19.3.0")
+            Objects.requireNonNullElse(System.getenv("PRETTIER_NODE_VERSION"), "19.3.0")
         )
         .replace("${pluginVersion}", System.getenv("PLUGIN_VERSION"))
         .replace("${prettierJavaVersion}", prettierJavaVersion)
@@ -62,17 +61,17 @@ public class TestConfiguration {
     private Builder() {}
 
   public Builder setPrettierJavaVersion(String prettierJavaVersion) {
-    this.prettierJavaVersion = Preconditions.checkNotNull(prettierJavaVersion);
+    this.prettierJavaVersion = Objects.requireNonNull(prettierJavaVersion);
     return this;
   }
 
   public Builder setInputGlobs(List<String> inputGlobs) {
-    this.inputGlobs = Preconditions.checkNotNull(inputGlobs);
+    this.inputGlobs = Objects.requireNonNull(inputGlobs);
     return this;
   }
 
   public Builder setGoal(Goal goal) {
-    this.goal = Preconditions.checkNotNull(goal);
+    this.goal = Objects.requireNonNull(goal);
     return this;
   }
 

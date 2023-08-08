@@ -1,11 +1,7 @@
 package com.hubspot.maven.plugins.prettier;
 
-import com.google.common.collect.ImmutableSet;
-import com.google.common.io.CharStreams;
-import com.google.common.io.Resources;
-import java.io.BufferedInputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
@@ -33,7 +29,7 @@ public abstract class AbstractPrettierMojoTest {
   protected static final String EMPTY = "empty/*.java";
   protected static final String BUILD_SUCCESS = "BUILD SUCCESS";
   protected static final String BUILD_FAILURE = "BUILD FAILURE";
-  private static final Set<String> PRETTIER_JAVA_VERSIONS_TO_TEST = ImmutableSet.of("1.6.2", "2.0.0", "2.2.0");
+  private static final Set<String> PRETTIER_JAVA_VERSIONS_TO_TEST = Set.of("1.6.2", "2.0.0", "2.2.0");
 
   protected static Set<String> getPrettierJavaVersionsToTest() {
     return PRETTIER_JAVA_VERSIONS_TO_TEST;
@@ -67,8 +63,8 @@ public abstract class AbstractPrettierMojoTest {
         .redirectErrorStream(true)
         .start();
 
-    try (InputStreamReader reader = new InputStreamReader(new BufferedInputStream(process.getInputStream()), StandardCharsets.UTF_8)) {
-      String output = CharStreams.toString(reader);
+    try {
+      String output = readString(process.getInputStream());
       boolean success = process.waitFor() == 0;
       return new MavenResult(success, output);
     } catch (InterruptedException e) {
@@ -123,14 +119,17 @@ public abstract class AbstractPrettierMojoTest {
       }
     });
 
-    String template = Resources.toString(
-        Resources.getResource("pom-template.xml"),
-        StandardCharsets.UTF_8
-    );
+    String template = readString(AbstractPrettierMojoTest.class.getResourceAsStream("/pom-template.xml"));
 
     String rendered = testConfiguration.render(template);
     Files.write(temp.resolve("pom.xml"), rendered.getBytes(StandardCharsets.UTF_8), StandardOpenOption.CREATE_NEW);
 
     return temp;
+  }
+
+  private static String readString(InputStream inputStream) throws IOException {
+    try (inputStream) {
+      return new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
+    }
   }
 }

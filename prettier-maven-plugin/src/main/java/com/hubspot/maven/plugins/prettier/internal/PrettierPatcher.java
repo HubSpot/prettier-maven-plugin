@@ -1,12 +1,15 @@
 package com.hubspot.maven.plugins.prettier.internal;
 
-import com.google.common.io.Resources;
 import java.io.File;
 import java.io.IOException;
 import java.lang.ProcessBuilder.Redirect;
 import java.net.URL;
+import java.nio.channels.Channels;
+import java.nio.channels.FileChannel;
+import java.nio.channels.ReadableByteChannel;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.util.Arrays;
 import java.util.List;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -70,9 +73,12 @@ public class PrettierPatcher {
     Path tmpFile = Files.createTempFile(originalDirectory.getParent(), "prettier-", ".patch");
     tmpFile.toFile().deleteOnExit();
 
-    byte[] bytes = Resources.toByteArray(source);
-    Files.write(tmpFile, bytes);
-
+    try (
+      ReadableByteChannel inputChannel = Channels.newChannel(source.openStream());
+      FileChannel outputChannel = FileChannel.open(tmpFile, StandardOpenOption.WRITE)
+    ) {
+      outputChannel.transferFrom(inputChannel, 0, Long.MAX_VALUE);
+    }
     return tmpFile.toFile();
   }
 }

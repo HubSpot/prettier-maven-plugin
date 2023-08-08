@@ -1,6 +1,5 @@
 package com.hubspot.maven.plugins.prettier;
 
-import com.google.common.io.Resources;
 import com.hubspot.maven.plugins.prettier.internal.NodeDownloader;
 import com.hubspot.maven.plugins.prettier.internal.NodeInstall;
 import com.hubspot.maven.plugins.prettier.internal.OperatingSystemFamily;
@@ -135,7 +134,7 @@ public abstract class PrettierArgs extends AbstractMojo {
 
       if (disableGenericsLinebreaks) {
         if (prettierJavaVersion.startsWith("2")) {
-          URL patch = Resources.getResource("no-linebreak-generics.patch");
+          URL patch = getClass().getResource("/no-linebreak-generics.patch");
           return new PrettierPatcher(prettierJava, getLog()).patch(patch, prettierJavaVersion);
         } else if ("1.5.0".compareTo(prettierJavaVersion) > 0) {
           // versions before 1.5.0 don't linebreak generics
