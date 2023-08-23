@@ -9,11 +9,15 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
+
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Parameter;
 
 public abstract class AbstractPrettierMojo extends PrettierArgs {
+
+  private static final Pattern ANSI_COLOR_CODE = Pattern.compile("\u001B\\[[;\\d]*m");
 
   @Parameter(defaultValue = "false")
   private boolean skip;
@@ -71,7 +75,7 @@ public abstract class AbstractPrettierMojo extends PrettierArgs {
         while ((line = stderr.readLine()) != null) {
           if (line.contains("No matching files.") || line.contains("No files matching")) {
             getLog().info(trimLogLevel(line));
-          } else if (line.contains("error")) {
+          } else if (ANSI_COLOR_CODE.matcher(line).replaceAll("").startsWith("[error]")) {
             getLog().error(trimLogLevel(line));
             hasError = true;
           } else {
