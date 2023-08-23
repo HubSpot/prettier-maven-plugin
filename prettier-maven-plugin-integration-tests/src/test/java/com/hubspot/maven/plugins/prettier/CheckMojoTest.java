@@ -72,6 +72,25 @@ public class CheckMojoTest extends AbstractPrettierMojoTest {
   }
 
   @TestFactory
+  public Stream<DynamicTest> itChecksBadJavaWithErrorInPath() {
+    return getPrettierJavaVersionsToTest().stream().map(prettierJavaVersion ->
+        DynamicTest.dynamicTest("itChecksBadJavaWithErrorInPath_prettier-java@" + prettierJavaVersion, () -> {
+          TestConfiguration testConfiguration = TestConfiguration
+              .newBuilder()
+              .setPrettierJavaVersion(prettierJavaVersion)
+              .setInputGlobs(Arrays.asList(JAVA_BAD_FORMATTING_ERROR_PATH))
+              .setGoal(Goal.CHECK)
+              .build();
+
+          MavenResult result = runMaven(testConfiguration);
+
+          assertThat(result.getSuccess()).isFalse();
+          assertThat(result.getOutput()).contains(BUILD_FAILURE);
+          assertThat(result.getOutput()).contains(incorrectlyFormattedFile(JAVA_BAD_FORMATTING_ERROR_PATH));
+        }));
+  }
+
+  @TestFactory
   public Stream<DynamicTest> itChecksBadJava() {
     return getPrettierJavaVersionsToTest().stream().map(prettierJavaVersion ->
         DynamicTest.dynamicTest("itChecksBadJava_prettier-java@" + prettierJavaVersion, () -> {

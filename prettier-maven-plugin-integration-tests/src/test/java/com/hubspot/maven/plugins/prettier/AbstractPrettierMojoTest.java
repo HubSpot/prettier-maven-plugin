@@ -25,6 +25,7 @@ public abstract class AbstractPrettierMojoTest {
 
   protected static final String JAVA_GOOD_FORMATTING = "java-good-formatting/*.java";
   protected static final String JAVA_BAD_FORMATTING = "java-bad-formatting/*.java";
+  protected static final String JAVA_BAD_FORMATTING_ERROR_PATH = "java-bad-formatting-error-path/*.java";
   protected static final String JAVA_INVALID_SYNTAX = "java-invalid-syntax/*.java";
   protected static final String JS_GOOD_FORMATTING = "js-good-formatting/*.js";
   protected static final String JS_BAD_FORMATTING = "js-bad-formatting/*.js";
