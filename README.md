@@ -6,7 +6,7 @@ There is a `check` goal which (optionally) fails the build if code isn't formatt
 
 ### Example Usage
 
-This example will run the `check` goal inside of Travis CI, and the `write` goal outside of Travis CI. You can update the profile activation conditions based on the CI tool you use.
+This example will run th `check` goal inside of Travis CI, and the `write` goal outside of Travis CI. You can update the profile activation conditions based on the CI tool you use.
 
 ```xml
 <properties>
