@@ -13,6 +13,7 @@ import org.apache.maven.plugin.MojoExecutionException;
 
 public enum OperatingSystemFamily {
   LINUX_X64("linux-x64", ArchiveType.TAR_GZ),
+  LINUX_ARM("linux-arm64", ArchiveType.TAR_GZ),
   MAC_X64("darwin-x64", ArchiveType.TAR_GZ),
   MAC_ARM("darwin-arm64", ArchiveType.TAR_GZ),
   WINDOWS_X64("win-x64", ArchiveType.ZIP);
@@ -38,7 +39,11 @@ public enum OperatingSystemFamily {
     }
 
     if (osFullName.startsWith("linux")) {
-      return OperatingSystemFamily.LINUX_X64;
+      if ("aarch64".equalsIgnoreCase(System.getProperty("os.arch"))) {
+        return OperatingSystemFamily.LINUX_ARM;
+      } else {
+        return OperatingSystemFamily.LINUX_X64;
+      }
     } else if (osFullName.startsWith("mac os x")) {
       if ("aarch64".equalsIgnoreCase(System.getProperty("os.arch"))) {
         return OperatingSystemFamily.MAC_ARM;
