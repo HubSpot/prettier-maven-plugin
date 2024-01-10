@@ -3,3 +3,9 @@ env:
 
 depends:
   - prettier-maven-plugin
+
+before:
+  - description: Fix nprmc
+    commands:
+      - cat /usr/share/hubspot/build/.npmrc | grep -v 'username = ' | grep -v  '_auth = ' > /tmp/nprmc
+      - cat /tmp/nprmc > /usr/share/hubspot/build/.npmrc
