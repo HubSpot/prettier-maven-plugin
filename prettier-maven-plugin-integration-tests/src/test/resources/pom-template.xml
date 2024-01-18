@@ -17,6 +17,7 @@
           <prettierJavaVersion>${prettierJavaVersion}</prettierJavaVersion>
           <ignoreConfigFile>true</ignoreConfigFile>
           <ignoreEditorConfig>true</ignoreEditorConfig>
+          <disableGenericsLinebreaks>true</disableGenericsLinebreaks>
           <inputGlobs>
             ${inputGlobs}
           </inputGlobs>
