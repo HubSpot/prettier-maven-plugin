@@ -2,5 +2,5 @@ import java.util.Map;
 
 public class Test {
 
-    private static final Map<VeryLongTypeNameAsTheMapKeyType, AnotherVeryLongTypeNameAsTheyMapValueType> map;
+  private static final Map<VeryLongTypeNameAsTheMapKeyType, AnotherVeryLongTypeNameAsTheyMapValueType> map;
 }
