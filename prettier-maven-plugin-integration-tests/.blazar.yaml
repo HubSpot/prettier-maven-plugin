@@ -1,5 +1,5 @@
 env:
-  PRETTIER_NODE_VERSION: 19.3.0
+  PRETTIER_NODE_VERSION: 16.13.2
 
 depends:
   - prettier-maven-plugin
