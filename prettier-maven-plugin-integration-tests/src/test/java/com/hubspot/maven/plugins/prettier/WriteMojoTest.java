@@ -1,12 +1,13 @@
 package com.hubspot.maven.plugins.prettier;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import com.hubspot.maven.plugins.prettier.TestConfiguration.Goal;
-import java.util.Arrays;
-import java.util.stream.Stream;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.TestFactory;
+
+import java.util.Arrays;
+import java.util.stream.Stream;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class WriteMojoTest extends AbstractPrettierMojoTest {
 
@@ -23,9 +24,9 @@ public class WriteMojoTest extends AbstractPrettierMojoTest {
 
           MavenResult result = runMaven(testConfiguration);
 
-          assertThat(result.getSuccess()).isTrue();
           assertThat(result.getOutput()).contains(BUILD_SUCCESS);
           assertThat(result.getOutput()).doesNotContain(noMatchingFiles(JAVA_GOOD_FORMATTING));
+          assertThat(result.getSuccess()).isTrue();
         })
     );
   }
@@ -43,9 +44,9 @@ public class WriteMojoTest extends AbstractPrettierMojoTest {
 
           MavenResult result = runMaven(testConfiguration);
 
-          assertThat(result.getSuccess()).isTrue();
           assertThat(result.getOutput()).contains(BUILD_SUCCESS);
           assertThat(result.getOutput()).doesNotContain(noMatchingFiles(JS_GOOD_FORMATTING));
+          assertThat(result.getSuccess()).isTrue();
         })
     );
   }
@@ -63,10 +64,10 @@ public class WriteMojoTest extends AbstractPrettierMojoTest {
 
           MavenResult result = runMaven(testConfiguration);
 
-          assertThat(result.getSuccess()).isTrue();
           assertThat(result.getOutput()).contains(BUILD_SUCCESS);
           assertThat(result.getOutput()).doesNotContain(noMatchingFiles(JAVA_GOOD_FORMATTING));
           assertThat(result.getOutput()).doesNotContain(noMatchingFiles(JS_GOOD_FORMATTING));
+          assertThat(result.getSuccess()).isTrue();
         })
     );
   }
@@ -84,9 +85,9 @@ public class WriteMojoTest extends AbstractPrettierMojoTest {
 
           MavenResult result = runMaven(testConfiguration);
 
-          assertThat(result.getSuccess()).isTrue();
           assertThat(result.getOutput()).contains(BUILD_SUCCESS);
           assertThat(result.getOutput()).contains(reformattedFile(JAVA_BAD_FORMATTING));
+          assertThat(result.getSuccess()).isTrue();
         })
     );
   }
@@ -104,9 +105,9 @@ public class WriteMojoTest extends AbstractPrettierMojoTest {
 
           MavenResult result = runMaven(testConfiguration);
 
-          assertThat(result.getSuccess()).isTrue();
           assertThat(result.getOutput()).contains(BUILD_SUCCESS);
           assertThat(result.getOutput()).contains(reformattedFile(JS_BAD_FORMATTING));
+          assertThat(result.getSuccess()).isTrue();
         })
     );
   }
@@ -124,10 +125,10 @@ public class WriteMojoTest extends AbstractPrettierMojoTest {
 
           MavenResult result = runMaven(testConfiguration);
 
-          assertThat(result.getSuccess()).isTrue();
           assertThat(result.getOutput()).contains(BUILD_SUCCESS);
           assertThat(result.getOutput()).contains(reformattedFile(JAVA_BAD_FORMATTING));
           assertThat(result.getOutput()).contains(reformattedFile(JS_BAD_FORMATTING));
+          assertThat(result.getSuccess()).isTrue();
         })
     );
   }
@@ -145,9 +146,9 @@ public class WriteMojoTest extends AbstractPrettierMojoTest {
 
           MavenResult result = runMaven(testConfiguration);
 
-          assertThat(result.getSuccess()).isFalse();
           assertThat(result.getOutput()).contains(BUILD_FAILURE);
           assertThat(result.getOutput()).contains(invalidJavaSyntax());
+          assertThat(result.getSuccess()).isFalse();
         })
     );
   }
@@ -165,9 +166,9 @@ public class WriteMojoTest extends AbstractPrettierMojoTest {
 
           MavenResult result = runMaven(testConfiguration);
 
-          assertThat(result.getSuccess()).isFalse();
           assertThat(result.getOutput()).contains(BUILD_FAILURE);
           assertThat(result.getOutput()).contains(invalidJsSyntax());
+          assertThat(result.getSuccess()).isFalse();
         })
     );
   }
@@ -185,10 +186,10 @@ public class WriteMojoTest extends AbstractPrettierMojoTest {
 
           MavenResult result = runMaven(testConfiguration);
 
-          assertThat(result.getSuccess()).isFalse();
           assertThat(result.getOutput()).contains(BUILD_FAILURE);
           assertThat(result.getOutput()).contains(invalidJavaSyntax());
           assertThat(result.getOutput()).contains(invalidJsSyntax());
+          assertThat(result.getSuccess()).isFalse();
         })
     );
   }
@@ -206,9 +207,9 @@ public class WriteMojoTest extends AbstractPrettierMojoTest {
 
           MavenResult result = runMaven(testConfiguration);
 
-          assertThat(result.getSuccess()).isFalse();
           assertThat(result.getOutput()).contains(BUILD_FAILURE);
           assertThat(result.getOutput()).contains(unknownExtension());
+          assertThat(result.getSuccess()).isFalse();
         })
     );
   }
@@ -226,9 +227,9 @@ public class WriteMojoTest extends AbstractPrettierMojoTest {
 
           MavenResult result = runMaven(testConfiguration);
 
-          assertThat(result.getSuccess()).isTrue();
           assertThat(result.getOutput()).contains(BUILD_SUCCESS);
           assertThat(result.getOutput()).contains(noMatchingFiles(EMPTY));
+          assertThat(result.getSuccess()).isTrue();
         })
     );
   }
@@ -246,9 +247,9 @@ public class WriteMojoTest extends AbstractPrettierMojoTest {
 
           MavenResult result = runMaven(testConfiguration);
 
-          assertThat(result.getSuccess()).isTrue();
           assertThat(result.getOutput()).contains(BUILD_SUCCESS);
           assertThat(result.getOutput()).contains(reformattedFile(JS_BAD_FORMATTING));
+          assertThat(result.getSuccess()).isTrue();
         })
     );
   }
@@ -266,11 +267,11 @@ public class WriteMojoTest extends AbstractPrettierMojoTest {
 
           MavenResult result = runMaven(testConfiguration);
 
-          assertThat(result.getSuccess()).isTrue();
           assertThat(result.getOutput()).contains(BUILD_SUCCESS);
           assertThat(result.getOutput()).doesNotContain(noMatchingFiles(JAVA_GOOD_FORMATTING));
           assertThat(result.getOutput()).doesNotContain(noMatchingFiles(JS_GOOD_FORMATTING));
           assertThat(result.getOutput()).contains(noMatchingFiles(EMPTY));
+          assertThat(result.getSuccess()).isTrue();
         })
     );
   }
@@ -288,11 +289,11 @@ public class WriteMojoTest extends AbstractPrettierMojoTest {
 
           MavenResult result = runMaven(testConfiguration);
 
-          assertThat(result.getSuccess()).isTrue();
           assertThat(result.getOutput()).contains(BUILD_SUCCESS);
           assertThat(result.getOutput()).contains(reformattedFile(JAVA_BAD_FORMATTING));
           assertThat(result.getOutput()).contains(reformattedFile(JS_BAD_FORMATTING));
           assertThat(result.getOutput()).contains(noMatchingFiles(EMPTY));
+          assertThat(result.getSuccess()).isTrue();
         })
     );
   }
