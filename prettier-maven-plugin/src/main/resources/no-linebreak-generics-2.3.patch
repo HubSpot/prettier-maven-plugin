@@ -1,0 +1,55 @@
+diff --git a/node_modules/prettier-plugin-java/dist/printers/classes.js b/node_modules/prettier-plugin-java/dist/printers/classes.js
+index c5197bc..b28507a 100644
+--- a/node_modules/prettier-plugin-java/dist/printers/classes.js
++++ b/node_modules/prettier-plugin-java/dist/printers/classes.js
+@@ -104,12 +104,12 @@ var ClassesPrettierVisitor = /** @class */ (function (_super) {
+     };
+     ClassesPrettierVisitor.prototype.typeParameters = function (ctx) {
+         var typeParameterList = this.visit(ctx.typeParameterList);
+-        return (0, printer_utils_1.putIntoBraces)(typeParameterList, softline, ctx.Less[0], ctx.Greater[0]);
++        return (0, printer_utils_1.rejectAndConcat)([ctx.Less[0], typeParameterList, ctx.Greater[0]]);
+     };
+     ClassesPrettierVisitor.prototype.typeParameterList = function (ctx) {
+         var typeParameter = this.mapVisit(ctx.typeParameter);
+-        var commas = ctx.Comma ? ctx.Comma.map(function (elt) { return (0, prettier_builder_1.concat)([elt, line]); }) : [];
+-        return (0, prettier_builder_1.group)((0, printer_utils_1.rejectAndJoinSeps)(commas, typeParameter));
++        var commas = ctx.Comma ? ctx.Comma.map(function (elt) { return (0, prettier_builder_1.concat)([elt, " "]); }) : [];
++        return (0, printer_utils_1.rejectAndJoinSeps)(commas, typeParameter);
+     };
+     ClassesPrettierVisitor.prototype.superclass = function (ctx) {
+         return (0, prettier_builder_1.join)(" ", [ctx.Extends[0], this.visit(ctx.classType)]);
+diff --git a/node_modules/prettier-plugin-java/dist/printers/types-values-and-variables.js b/node_modules/prettier-plugin-java/dist/printers/types-values-and-variables.js
+index 6505bbb..ea6fd01 100644
+--- a/node_modules/prettier-plugin-java/dist/printers/types-values-and-variables.js
++++ b/node_modules/prettier-plugin-java/dist/printers/types-values-and-variables.js
+@@ -148,12 +148,10 @@ var TypesValuesAndVariablesPrettierVisitor = /** @class */ (function (_super) {
+     TypesValuesAndVariablesPrettierVisitor.prototype.typeBound = function (ctx) {
+         var classOrInterfaceType = this.visit(ctx.classOrInterfaceType);
+         var additionalBound = this.mapVisit(ctx.additionalBound);
+-        return (0, prettier_builder_1.concat)([
+-            (0, printer_utils_1.rejectAndJoin)(" ", [ctx.Extends[0], classOrInterfaceType]),
+-            (0, prettier_builder_1.indent)((0, prettier_builder_1.group)((0, prettier_builder_1.concat)([
+-                additionalBound.length ? line : "",
+-                (0, printer_utils_1.rejectAndJoin)(line, additionalBound)
+-            ])))
++        return (0, printer_utils_1.rejectAndJoin)(" ", [
++            ctx.Extends[0],
++            classOrInterfaceType,
++            (0, prettier_builder_1.join)(" ", additionalBound)
+         ]);
+     };
+     TypesValuesAndVariablesPrettierVisitor.prototype.additionalBound = function (ctx) {
+@@ -162,11 +160,11 @@ var TypesValuesAndVariablesPrettierVisitor = /** @class */ (function (_super) {
+     };
+     TypesValuesAndVariablesPrettierVisitor.prototype.typeArguments = function (ctx) {
+         var typeArgumentList = this.visit(ctx.typeArgumentList);
+-        return (0, printer_utils_1.putIntoBraces)(typeArgumentList, softline, ctx.Less[0], ctx.Greater[0]);
++        return (0, printer_utils_1.rejectAndConcat)([ctx.Less[0], typeArgumentList, ctx.Greater[0]]);
+     };
+     TypesValuesAndVariablesPrettierVisitor.prototype.typeArgumentList = function (ctx) {
+         var typeArguments = this.mapVisit(ctx.typeArgument);
+-        var commas = ctx.Comma ? ctx.Comma.map(function (elt) { return (0, prettier_builder_1.concat)([elt, line]); }) : [];
++        var commas = ctx.Comma ? ctx.Comma.map(function (elt) { return (0, prettier_builder_1.concat)([elt, " "]); }) : [];
+         return (0, printer_utils_1.rejectAndJoinSeps)(commas, typeArguments);
+     };
+     TypesValuesAndVariablesPrettierVisitor.prototype.typeArgument = function (ctx) {
