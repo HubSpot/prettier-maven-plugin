@@ -1,13 +1,12 @@
 package com.hubspot.maven.plugins.prettier;
 
-import com.hubspot.maven.plugins.prettier.TestConfiguration.Goal;
-import org.junit.jupiter.api.DynamicTest;
-import org.junit.jupiter.api.TestFactory;
+import static org.assertj.core.api.Assertions.assertThat;
 
+import com.hubspot.maven.plugins.prettier.TestConfiguration.Goal;
 import java.util.Arrays;
 import java.util.stream.Stream;
-
-import static org.assertj.core.api.Assertions.assertThat;
+import org.junit.jupiter.api.DynamicTest;
+import org.junit.jupiter.api.TestFactory;
 
 public class WriteMojoTest extends AbstractPrettierMojoTest {
 
