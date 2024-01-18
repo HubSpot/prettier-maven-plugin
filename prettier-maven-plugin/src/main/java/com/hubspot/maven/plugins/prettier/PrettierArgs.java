@@ -135,8 +135,8 @@ public abstract class PrettierArgs extends AbstractMojo {
 
       if (disableGenericsLinebreaks) {
         if (prettierJavaVersion.startsWith("2")) {
-          URL patch = "2.5".compareTo(prettierJavaVersion) < 0
-            ? getClass().getResource("/no-linebreak-generics-2.5.patch")
+          URL patch = "2.3".compareTo(prettierJavaVersion) < 0
+            ? getClass().getResource("/no-linebreak-generics-2.3.patch")
             : getClass().getResource("/no-linebreak-generics.patch") ;
           return new PrettierPatcher(prettierJava, getLog()).patch(patch, prettierJavaVersion);
         } else if ("1.5.0".compareTo(prettierJavaVersion) > 0) {
