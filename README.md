@@ -95,6 +95,19 @@ If you want to customize the behavior of prettier, you can use a normal prettier
 | inputGlobs          | prettier.inputGlobs          | `src/{main,test}/java/**/*.java` | Controls the input paths passed to prettier, useful for formatting additional directories or file types. More information [here](https://prettier.io/docs/en/cli.html#file-patterns)                                                                              |
 | disableGenericsLinebreaks | prettier.disableGenericsLinebreaks | `false` | Prevents prettier from adding linebreaks to generic type declarations (see https://github.com/HubSpot/prettier-maven-plugin/pull/78 for more background) |
 
+### Generic Linebreaks
+
+The `disableGenericsLinebreaks` option is implemented by patching prettier-plugin-java after downloading. As new versions of prettier-java are released, we may need to create updated patches. The basic flow for creating a new patch is:
+1. Download the new version of prettier-java
+  - `cd /tmp && npm install prettier-plugin-java@{version}`
+2. Make two copies of prettier-java code
+  - `mkdir -p a/node_modules && cp -r node_modules/prettier-plugin-java a/node_modules`)
+  - `mkdir -p b/node_modules && cp -r node_modules/prettier-plugin-java b/node_modules`)
+3. Update the code within `b/node_modules/prettier-plugin-java/dist/` as needed to revert the generic linebreak behavior (for now, these are the relevant PRs: [#512](https://github.com/jhipster/prettier-java/pull/512), [#584](https://github.com/jhipster/prettier-java/pull/584))
+4. Generate a diff between `a/` (original code) and `b/` (updated code)
+  - `git diff -p a b --no-prefix > no-linebreak-generics-{version}.patch`
+5. Add the patch to `src/main/resources/` and update the logic in `PrettierArgs.java` to use it as appropriate
+
 ### Note
 
 For convenience, this plugin downloads Node, prettier, and prettier-java as needed. Node is downloaded from https://nodejs.org/dist/ and prettier-plugin-java is downloaded via npm
