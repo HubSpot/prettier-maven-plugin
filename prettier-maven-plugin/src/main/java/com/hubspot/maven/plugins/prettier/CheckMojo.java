@@ -1,15 +1,18 @@
 package com.hubspot.maven.plugins.prettier;
 
-import com.hubspot.maven.plugins.prettier.diff.DiffGenerator;
-import com.hubspot.maven.plugins.prettier.diff.GenerateDiffArgs;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
+
+import com.hubspot.maven.plugins.prettier.diff.DiffGenerator;
+import com.hubspot.maven.plugins.prettier.diff.GenerateDiffArgs;
 
 @Mojo(name = "check", threadSafe = true)
 public class CheckMojo extends AbstractPrettierMojo {
@@ -32,6 +35,11 @@ public class CheckMojo extends AbstractPrettierMojo {
   @Override
   protected String getPrettierCommand() {
     return "check";
+  }
+
+  @Override
+  protected Optional<String> getSpotlessReplacement() {
+    return Optional.of("check");
   }
 
   private final List<Path> incorrectlyFormattedFiles = new ArrayList<>();

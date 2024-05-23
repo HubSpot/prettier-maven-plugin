@@ -1,7 +1,5 @@
 package com.hubspot.maven.plugins.prettier;
 
-import com.hubspot.maven.plugins.prettier.internal.NodeInstall;
-import com.hubspot.maven.plugins.prettier.internal.PrettierPaths;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -9,15 +7,26 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Pattern;
 
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Parameter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.hubspot.maven.plugins.prettier.internal.NodeInstall;
+import com.hubspot.maven.plugins.prettier.internal.PrettierPaths;
 
 public abstract class AbstractPrettierMojo extends PrettierArgs {
 
+  private static final Logger LOG = LoggerFactory.getLogger(AbstractPrettierMojo.class);
+
   private static final Pattern ANSI_COLOR_CODE = Pattern.compile("\u001B\\[[;\\d]*m");
+
+  private static final AtomicBoolean REGISTERED_SHUTDOWN_WARNING = new AtomicBoolean(false);
 
   @Parameter(defaultValue = "false")
   private boolean skip;
@@ -29,8 +38,16 @@ public abstract class AbstractPrettierMojo extends PrettierArgs {
   protected abstract void handlePrettierNonZeroExit(int status)
     throws MojoExecutionException, MojoFailureException;
 
+  protected abstract Optional<String> getSpotlessReplacement();
+
   @Override
   public final void execute() throws MojoExecutionException, MojoFailureException {
+    logDeprecation();
+
+    if (REGISTERED_SHUTDOWN_WARNING.compareAndSet(false, true)) {
+      Runtime.getRuntime().addShutdownHook(new Thread(this::logDeprecation));
+    }
+
     if (skip) {
       getLog().info("Skipping plugin execution");
       return;
@@ -94,6 +111,32 @@ public abstract class AbstractPrettierMojo extends PrettierArgs {
     } catch (IOException | InterruptedException e) {
       throw new MojoExecutionException("Error trying to run prettier-java", e);
     }
+
+    logDeprecation();
+  }
+
+  protected void logDeprecation() {
+    getSpotlessReplacement().ifPresent(replacement -> {
+      LOG.warn("");
+      LOG.warn("");
+      LOG.warn("************************************************************************");
+      LOG.warn("  _____  ______ _____  _____  ______ _____       _______ ______ _____  ");
+      LOG.warn(" |  __ \\|  ____|  __ \\|  __ \\|  ____/ ____|   /\\|__   __|  ____|  __ \\ ");
+      LOG.warn(" | |  | | |__  | |__) | |__) | |__ | |       /  \\  | |  | |__  | |  | |");
+      LOG.warn(" | |  | |  __| |  ___/|  _  /|  __|| |      / /\\ \\ | |  |  __| | |  | |");
+      LOG.warn(" | |__| | |____| |    | | \\ \\| |___| |____ / ____ \\| |  | |____| |__| |");
+      LOG.warn(" |_____/|______|_|    |_|  \\_\\______\\_____/_/    \\_\\_|  |______|_____/ ");
+      LOG.warn("                                                                       ");
+      LOG.warn("                                                                       ");
+      LOG.warn("************************************************************************");
+      LOG.warn("");
+      LOG.warn("");
+      LOG.warn("Prettier-maven-plugin is DEPRECATED and will soon be removed.");
+      LOG.warn("The replacements, Spotless, is drop-in compatible and offers enhanced functionality.");
+      LOG.warn("Please transition to Spotless by running `spotless:{}` instead!", replacement);
+      LOG.warn("");
+      LOG.warn("");
+    });
   }
 
   protected static MojoExecutionException prettierExecutionFailed(int status) throws MojoExecutionException {

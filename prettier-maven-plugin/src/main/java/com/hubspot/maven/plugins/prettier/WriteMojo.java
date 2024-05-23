@@ -1,7 +1,9 @@
 package com.hubspot.maven.plugins.prettier;
 
+import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
+
 import org.apache.maven.plugins.annotations.Mojo;
 
 @Mojo(name = "write", threadSafe = true)
@@ -13,6 +15,11 @@ public class WriteMojo extends AbstractPrettierMojo {
   @Override
   protected String getPrettierCommand() {
     return "write";
+  }
+
+  @Override
+  protected Optional<String> getSpotlessReplacement() {
+    return Optional.of("apply");
   }
 
   @Override
