@@ -129,7 +129,7 @@ public abstract class AbstractPrettierMojo extends PrettierArgs {
       LOG.warn("");
       LOG.warn("");
       LOG.warn("Prettier-maven-plugin is DEPRECATED and will soon be removed.");
-      LOG.warn("The replacements, Spotless, is drop-in compatible and offers enhanced functionality.");
+      LOG.warn("The replacement, Spotless, is drop-in compatible and offers enhanced functionality.");
       LOG.warn("Please transition to Spotless by running `spotless:{}` instead!", replacement);
       LOG.warn("");
       LOG.warn("");
