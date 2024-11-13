@@ -19,9 +19,10 @@ This example will run the `check` goal inside of Travis CI, and the `write` goal
     <plugin>
       <groupId>com.hubspot.maven.plugins</groupId>
       <artifactId>prettier-maven-plugin</artifactId>
-      <version>0.16</version>
+      <version>0.22</version>
       <configuration>
-        <prettierJavaVersion>2.0.0</prettierJavaVersion>
+        <!-- Find the latest version at https://github.com/jhipster/prettier-java/releases -->
+        <prettierJavaVersion>2.6.5</prettierJavaVersion>
         <printWidth>90</printWidth>
         <tabWidth>2</tabWidth>
         <useTabs>false</useTabs>
@@ -82,10 +83,10 @@ If you want to customize the behavior of prettier, you can use a normal prettier
 | fail                | N/A                          | true                             | **Only appplies to `check` goal**. If set to true, the plugin execution will fail if any unformatted files are found                                                                                                                                              |
 | generateDiff        | N/A                          | false                            | **Only appplies to `check` goal. Be sure to have to sh and diff in your PATH**. If set to true, a diff will be generated between the current code and the prettier-formatted code.                                                                                |
 | diffGenerator       | prettier.diffGenerator       | _                                | **Only appplies to `check` goal**. Can be used to supply a custom implementation of [`DiffGenerator`](https://github.com/HubSpot/prettier-maven-plugin/blob/master/prettier-maven-plugin/src/main/java/com/hubspot/maven/plugins/prettier/diff/DiffGenerator.java) 
-| nodeVersion         | prettier.nodeVersion         | 16.13.1                          | Controls version of Node used to run prettier-java.                                                                                                                                                                                                               |
+| nodeVersion         | prettier.nodeVersion         | 20.9.0                           | Controls version of Node used to run prettier-java.                                                                                                                                                                                                               |
 | nodePath            | prettier.nodePath            | -                                | Can be used to supply your own node executable, rather than having the plugin download it. To use the version of node on your `$PATH`, you can simply set this option to `node`.                  |
 | npmPath             | prettier.npmPath             | -                                | Can be used to supply your own npm executable, rather than having the plugin download it. To use the version of npm on your `$PATH`, you can simply set this option to `npm`.                      |
-| prettierJavaVersion | prettier.prettierJavaVersion | 0.7.0                            | Controls version of prettier-java that is used.                                                             |
+| prettierJavaVersion | prettier.prettierJavaVersion | 2.6.5                            | Controls version of prettier-java that is used.                                                             |
 | printWidth          | prettier.printWidth          | `null`                           | If set, will be passed to prettier as `--print-width`. More information [here](https://prettier.io/docs/en/options.html#print-width)                                                                                                                              |
 | tabWidth            | prettier.tabWidth            | `null`                           | If set, will be passed to prettier as `--tab-width`. More information [here](https://prettier.io/docs/en/options.html#tab-width)                                                                                                                                  |
 | useTabs             | prettier.useTabs             | `null`                           | If set, will be passed to prettier as `--use-tabs`. More information [here](https://prettier.io/docs/en/options.html#tabs)                                                                                                                                        |
